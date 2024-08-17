@@ -1,11 +1,9 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 import mysql.connector
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
-CORS(app)
+app.secret_key = 'NavigateBuy'
 
 # Configuração do login 
 login_manager = LoginManager()
@@ -37,13 +35,26 @@ def load_user(user_id):
         return User(user['id'], user['email'], user['password'])
     return None
 
-# Rota para o endpoint de login
-@app.route('/login', methods=['POST'])
+def add_cors_headers(response):
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
+
+@app.after_request
+def after_request(response):
+    return add_cors_headers(response)
+
+@app.route('/api/login', methods=['POST'])
 def login():
-    data = request.json 
-    email = data.get('email')  
-    password = data.get('password')  
-    
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({"message": "Email e senha são obrigatórios"}), 400
+
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
     user = cursor.fetchone()
@@ -58,15 +69,13 @@ def login():
     else:
         return jsonify({"message": "Cadastro não existente"}), 404
 
-# Rota para logout
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
     logout_user()
     return jsonify({"message": "Logout feito com sucesso"}), 200
 
-# Rota para editar o perfil do usuário
-@app.route('/editar-perfil', methods=['POST'])
+@app.route('/edit_profile', methods=['POST'])
 @login_required
 def edit_profile():
     data = request.json
@@ -90,4 +99,4 @@ def edit_profile():
         cursor.close()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

@@ -4,6 +4,8 @@ import mysql.connector
 from mysql.connector import Error
 
 app = Flask(__name__)
+
+# Configuração do CORS
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
 # Configurações do banco de dados
@@ -23,17 +25,8 @@ def get_db_connection():
         print(f"Erro ao conectar ao MySQL: {e}")
         return None
 
-# Configuração do CORS para evitar erros
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-    response.headers.add('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, DELETE')
-    return response
-
-
 # Define a rota para o endpoint de registro de usuários
-@app.route('/api/app', methods=['POST'])
+@app.route('/api/register', methods=['POST'])
 def register_user():
     try:
         # Obtém os dados JSON da solicitação
@@ -56,11 +49,13 @@ def register_user():
         query = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
         cursor.execute(query, (username, email, password))
         connection.commit()
-        return jsonify({"message": "Registro feito com sucesso!"}), 201
+        return jsonify({"message": "Registro feito com sucesso!"}), 201 
     except Error as e:
         print(f"Erro ao executar consulta: {e}")
         return jsonify({"message": "Erro ao se registrar", "Tente novamente": str(e)}), 500
-
+    except Exception as e:
+        print(f"Erro inesperado: {e}")
+        return jsonify({"message": "Erro inesperado", "error": str(e)}), 500
     finally:
         if 'cursor' in locals():
             cursor.close()
