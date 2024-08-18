@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router'; // Corrigida a importação do useRouter
+import { useRouter } from 'next/router'; 
 import "../app/globals.css";
 
 const Confirmacao = () => {
@@ -13,7 +14,7 @@ const Confirmacao = () => {
     e.preventDefault();
   
     try {
-      const response = await fetch('http://localhost:5000/api/send_code', {
+      const response = await fetch('http://localhost:5001/api/send_code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +39,7 @@ const Confirmacao = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/api/confirm_code', {
+      const response = await fetch('http://localhost:5001/api/confirm_code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +54,7 @@ const Confirmacao = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      router.push('/editar-perfil'); // Redireciona para a página de edição de perfil
+      router.push('/home'); 
     } catch (error) {
       console.error('Erro na confirmação:', error);
     }

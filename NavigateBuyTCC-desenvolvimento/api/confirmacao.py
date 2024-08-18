@@ -105,4 +105,4 @@ def confirm_code():
     return jsonify(message='Código de confirmação inválido.'), 400
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=5001)

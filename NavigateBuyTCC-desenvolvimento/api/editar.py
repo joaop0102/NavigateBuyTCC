@@ -1,102 +1,96 @@
-from flask import Flask, request, jsonify
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-import mysql.connector
+from flask import Flask, request, jsonify, session
+from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
+import os
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = 'NavigateBuy'
 
-# Configuração do login 
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
+# Configuração do CORS
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000", "methods": ["GET", "POST", "OPTIONS"], "supports_credentials": True}})
 
-# Configuração do MySQL
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="",
-    database="bdnavigate"
-)
+# Configurações do Flask
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/bdnavigate'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'NavigateBuy') 
+app.config['SESSION_COOKIE_SECURE'] = False  
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+db = SQLAlchemy(app)
 
-# Define a classe User que representa um usuário no sistema
-class User(UserMixin):
-    def __init__(self, id, email, password):
-        self.id = id 
-        self.email = email 
-        self.password = password 
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
 
-# Função que carrega um usuário a partir de um ID
-@login_manager.user_loader
-def load_user(user_id):
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM users WHERE id=%s", (user_id,))
-    user = cursor.fetchone()
-    if user:
-        return User(user['id'], user['email'], user['password'])
-    return None
-
-def add_cors_headers(response):
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    return response
-
-@app.after_request
-def after_request(response):
-    return add_cors_headers(response)
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    data = request.json
+    data = request.get_json()
     email = data.get('email')
     password = data.get('password')
 
-    if not email or not password:
-        return jsonify({"message": "Email e senha são obrigatórios"}), 400
-
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
-    user = cursor.fetchone()
-    
-    if user:
-        if user['password'] == password:
-            user_obj = User(user['id'], user['email'], user['password'])
-            login_user(user_obj)
-            return jsonify({"message": "Login bem sucedido"}), 200
-        else:
-            return jsonify({"message": "Senha incorreta"}), 401
+    user = User.query.filter_by(email=email).first()
+    if user and user.check_password(password):
+        session['user_id'] = user.id
+        print(f"Usuário {user.id} autenticado e sessão criada.")
+        return jsonify({'message': 'Login realizado com sucesso!'}), 200
     else:
-        return jsonify({"message": "Cadastro não existente"}), 404
+        return jsonify({'error': 'Email ou senha incorretos.'}), 401
 
-@app.route('/logout', methods=['GET', 'POST'])
-@login_required
+@app.route('/api/perfil', methods=['GET'])
+def get_perfil():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Usuário não autenticado.'}), 401
+
+    user = User.query.get(session['user_id'])
+    if user:
+        return jsonify({
+            'username': user.username,
+            'email': user.email
+        }), 200
+    return jsonify({'error': 'Usuário não encontrado.'}), 404
+
+@app.route('/api/perfil', methods=['POST'])
+def editar_perfil():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Usuário não autenticado.'}), 401
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'Usuário não encontrado.'}), 404
+
+    data = request.get_json()
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+
+    if username and username != user.username:
+        if User.query.filter_by(username=username).first():
+            return jsonify({'error': 'Nome de usuário já em uso.'}), 400
+        user.username = username
+
+    if email and email != user.email:
+        if User.query.filter_by(email=email).first():
+            return jsonify({'error': 'Email já em uso.'}), 400
+        user.email = email
+
+    if password:
+        user.set_password(password)
+
+    db.session.commit()
+    return jsonify({'message': 'Perfil atualizado com sucesso!'}), 200
+
+@app.route('/api/logout', methods=['POST'])
 def logout():
-    logout_user()
-    return jsonify({"message": "Logout feito com sucesso"}), 200
-
-@app.route('/edit_profile', methods=['POST'])
-@login_required
-def edit_profile():
-    data = request.json
-    new_email = data.get('email')
-    new_password = data.get('password')
-
-    if not new_email or not new_password:
-        return jsonify({"message": "Email e senha são obrigatórios"}), 400
-
-    cursor = db.cursor()
-
-    try:
-        cursor.execute("UPDATE users SET email=%s, password=%s WHERE id=%s", 
-                       (new_email, new_password, current_user.id))
-        db.commit()
-        return jsonify({"message": "Perfil atualizado com sucesso"}), 200
-    except mysql.connector.Error as err:
-        db.rollback()  # Rollback em caso de erro
-        return jsonify({"message": f"Erro ao atualizar perfil: {err}"}), 500
-    finally:
-        cursor.close()
+    session.pop('user_id', None)
+    return jsonify({'message': 'Logout realizado com sucesso!'}), 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True, port=5001)

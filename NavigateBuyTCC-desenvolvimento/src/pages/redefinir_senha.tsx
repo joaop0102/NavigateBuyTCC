@@ -3,48 +3,55 @@ import { useRouter } from 'next/router';
 import "../app/globals.css";
 
 const ResetPassword: React.FC = () => {
-    const [email, setEmail] = useState<string>('');
     const [newPassword, setNewPassword] = useState<string>('');
     const [message, setMessage] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
 
     useEffect(() => {
-        const { email } = router.query;
-        if (typeof email === 'string') {
-            setEmail(email);
+        if (router.isReady) {
+            const { token } = router.query;
+            console.log('Valor do token capturado no useEffect:', token);
+            if (typeof token === 'string') {
+                ''
+            }
         }
-    }, [router.query]);
+    }, [router.isReady, router.query]);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const token = router.query.token;
+
+        if (!token || !newPassword) {
+            setMessage('Token e nova senha são obrigatórios.');
+            return;
+        }
+
         setLoading(true);
 
         try {
-            // Envia a solicitação para redefinir a senha
-            const response = await fetch('http://localhost:5000/api/reset-password', {
+            const response = await fetch('http://localhost:5000/api/reset_password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, new_password: newPassword }), 
+                body: JSON.stringify({ token, password: newPassword }),
             });
 
             if (!response.ok) {
-                throw new Error('Ocorreu um erro ao redefinir a senha.');
+                throw new Error('Token expirado, tente novamente.');
             }
 
             setMessage('Senha redefinida com sucesso.');
+            router.push('/login');
         } catch (error) {
-            if (error instanceof Error) {
-                setMessage(error.message || 'Ocorreu um erro.');
-            } else {
-                setMessage('Ocorreu um erro desconhecido.');
-            }
+            setMessage(error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.');
         } finally {
             setLoading(false);
         }
     };
+    
 
     return (
         <header className="flex flex-col md:flex-row h-screen">
@@ -61,7 +68,9 @@ const ResetPassword: React.FC = () => {
                             <div className="w-full px-3 relative">
                                 <input
                                     type="password"
-                                    className="py-3 sm:py-4 md:py-5 lg:py-5 pl-12 sm:pl-14 md:pl-16 lg:pl-20 pr-4 w-full text-base sm:text-lg md:text-xl lg:text-2xl rounded-2xl border border-black focus:outline-none shadow-md transition duration-500 ease-in-out"
+                                    className="py-3 sm:py-4 md:py-5 lg:py-5 pl-12 sm:pl-14 md:pl-16 lg:pl-20 
+                                    pr-4 w-full text-base sm:text-lg md:text-xl lg:text-2xl rounded-2xl border
+                                    border-black focus:outline-none shadow-md transition duration-500 ease-in-out"
                                     placeholder="Nova Senha"
                                     required
                                     value={newPassword}
@@ -72,7 +81,10 @@ const ResetPassword: React.FC = () => {
                         <div className="text-center">
                             <button
                                 type="submit"
-                                className={`mt-4 py-3 sm:py-4 md:py-5 lg:py-6 px-6 sm:px-8 md:px-16 lg:px-28 text-2xl sm:text-2xl md:text-2xl lg:text-2xl rounded-full border-2 ${loading ? 'bg-gray-500' : 'bg-slate-900'} text-white font-semibold transition duration-1000 ease-in-out hover:bg-white hover:text-slate-900 hover:border-slate-900`}
+                                className={`mt-4 py-3 sm:py-4 md:py-5 lg:py-6 px-6 sm:px-8 md:px-16 lg:px-28 
+                                    text-2xl sm:text-2xl md:text-2xl lg:text-2xl rounded-full border-2 
+                                    ${loading ? 'bg-gray-500' : 'bg-slate-900'} text-white font-semibold transition duration-1000 
+                                    ease-in-out hover:bg-white hover:text-slate-900 hover:border-slate-900`}
                                 disabled={loading}
                             >
                                 {loading ? 'Redefinindo...' : 'Redefinir Senha'}

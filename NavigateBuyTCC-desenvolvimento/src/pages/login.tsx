@@ -1,5 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import "../app/globals.css";
 import "./login.css";
@@ -8,6 +9,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const router = useRouter(); 
   const [touched, setTouched] = useState({
     email: false,
     password: false,
@@ -31,8 +33,12 @@ const Login = () => {
   
       const data = await response.json();
       setMessage('Login realizado com sucesso!');
-      // Você pode redirecionar ou realizar outra ação aqui
   
+      // Armazenar os dados no localStorage
+      localStorage.setItem('userEmail', email);
+      localStorage.setItem('userPassword', password);
+  
+      router.push('/editar-perfil');
     } catch (error) {
       if (error instanceof Error) {
         setMessage(error.message || 'Ocorreu um erro.');
@@ -40,7 +46,7 @@ const Login = () => {
         setMessage('Ocorreu um erro desconhecido.');
       }
     }
-  };
+  };  
 
   const handleBlur = (field: string) => {
     setTouched({ ...touched, [field]: true });
