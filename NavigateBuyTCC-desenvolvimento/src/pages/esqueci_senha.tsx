@@ -28,10 +28,7 @@ const EsqueciSenha: React.FC = () => {
           }
 
           const data = await response.json();
-          const token = data.token;
-
-          // Redireciona para a página de redefinição de senha usando o token
-          router.push(`/redefinir_senha?token=${token}`);
+          setMessage(data.message);
       } catch (error) {
           if (error instanceof Error) {
               setMessage(error.message || 'Ocorreu um erro.');
@@ -42,7 +39,7 @@ const EsqueciSenha: React.FC = () => {
           setLoading(false);
       }
   };
-  
+
   return (
     <header className="flex flex-col md:flex-row h-screen">
       <Head>
@@ -73,12 +70,13 @@ const EsqueciSenha: React.FC = () => {
             <div className="text-center">
               <button
                 type="submit"
-                className={`mt-4 py-3 sm:py-4 md:py-5 lg:py-6 px-6 sm:px-8 md:px-16 lg:px-28 text-2xl sm:text-2xl md:text-2xl lg:text-2xl rounded-full border-2 ${loading ? 'bg-gray-500' : 'bg-slate-900'} text-white font-semibold transition duration-1000 ease-in-out hover:bg-white hover:text-slate-900 hover:border-slate-900`}
-                disabled={loading}
-              >
+                className={`mt-4 py-3 sm:py-4 md:py-5 lg:py-6 px-6 sm:px-8 md:px-16 lg:px-28 text-2xl sm:text-2xl md:text-2xl lg:text-2xl rounded-full border-2 
+                  ${loading ? 'bg-gray-500' : 'bg-slate-900'}
+                 text-white font-semibold transition duration-1000 ease-in-out hover:bg-white hover:text-slate-900 hover:border-slate-900`}
+                disabled={loading}>
                 {loading ? 'Enviando...' : 'Enviar'}
               </button>
-              <Link href="/redefinir_senha" className="mt-4 block text-sm text-[#0E023B] hover:underline">
+              <Link href="/login" className="mt-4 block text-sm text-[#0E023B] hover:underline">
                 Voltar ao Login
               </Link>
             </div>

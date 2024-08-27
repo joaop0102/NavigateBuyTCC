@@ -37,7 +37,6 @@ const Login = () => {
       // Armazenar os dados no localStorage
       localStorage.setItem('userEmail', email);
       localStorage.setItem('userPassword', password);
-  
       router.push('/editar-perfil');
     } catch (error) {
       if (error instanceof Error) {

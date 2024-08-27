@@ -2,13 +2,12 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import os
-import hashlib
-import secrets
-from datetime import datetime, timedelta
-import binascii
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
 
 # Configurações do Flask
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/bdnavigate'
@@ -20,28 +19,33 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    reset_token = db.Column(db.String(120))  
-    token_expiration = db.Column(db.DateTime) 
 
-    # método de hash para scriptar a senha
-    def set_password(self, password):
-        salt = os.urandom(16)
-        key = hashlib.scrypt(
-            password.encode(),
-            salt=salt,
-            n=16384,
-            r=8,
-            p=1,
-            dklen=64
-        )
-        self.password = f'scrypt:{binascii.hexlify(salt).decode()}${binascii.hexlify(key).decode()}'
+# Função para enviar o email
+def enviar_email(destinatario, assunto, corpo):
+    remetente = "navigatebuy@gmail.com"
+    senha = "b q x w a x w u b z k h s t s d" 
 
-# Rota para solicitar a redefinição de senha
-import secrets
-from datetime import datetime, timedelta
+    msg = MIMEMultipart()
+    msg['From'] = remetente
+    msg['To'] = destinatario
+    msg['Subject'] = assunto
+    msg.attach(MIMEText(corpo, 'html'))
 
-@app.route('/api/request-password-reset', methods=['POST'])
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(remetente, senha)
+            server.sendmail(remetente, destinatario, msg.as_string())
+        print("E-mail enviado com sucesso.")
+    except Exception as e:
+        print(f"Erro ao enviar email: {e}")
+
+# Adiciona suporte para requisições OPTIONS
+@app.route('/api/request-password-reset', methods=['OPTIONS', 'POST'])
 def request_password_reset():
+    if request.method == 'OPTIONS':
+        return '', 200
+
     data = request.get_json()
     if not data or 'email' not in data:
         return jsonify({"error": "Dados de entrada inválidos."}), 400
@@ -50,38 +54,37 @@ def request_password_reset():
     user = User.query.filter_by(email=email).first()
 
     if user:
-        token = secrets.token_urlsafe(32)
-        expiration = datetime.utcnow() + timedelta(hours=1)
-        
-        user.reset_token = token
-        user.token_expiration = expiration
-        db.session.commit()
+        link_redefinicao = f"http://localhost:3000/redefinir_senha?email={email}"
+        corpo_email = f"""
+        <h3>Redefinição de Senha</h3>
+        <p>Clique no botão abaixo para redefinir sua senha:</p>
+        <a href="{link_redefinicao}" style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Redefinir Senha</a>
+        <p>Se você não solicitou a redefinição de senha, por favor, ignore este email.</p>
+        """
 
-        return jsonify({"token": token}), 200
+        enviar_email(email, "Redefinição de Senha - Navigate Buy", corpo_email)
+        return jsonify({"message": "Email de redefinição de senha enviado."}), 200
     else:
         return jsonify({"error": "Email não encontrado."}), 404
-
+    
+# Endpoint para redefinir a senha
 @app.route('/api/reset_password', methods=['POST'])
 def reset_password():
     data = request.get_json()
-    print(f"Dados recebidos: {data}")  
-    
-    token = data.get('token')
+    email = data.get('email')
     new_password = data.get('password')
 
-    if not token or not new_password:
-        return jsonify({'error': 'Token e nova senha são obrigatórios.'}), 400  
+    if not email or not new_password:
+        return jsonify({"error": "Dados insuficientes."}), 400
 
-    user = User.query.filter_by(reset_token=token).first()
+    user = User.query.filter_by(email=email).first()
 
-    if user and user.token_expiration > datetime.utcnow():
-        user.password = new_password  
-        user.reset_token = None  
-        user.token_expiration = None
+    if user:
+        user.password = new_password
         db.session.commit()
-        return jsonify({'message': 'Sua senha foi redefinida com sucesso!'}), 200
+        return jsonify({"message": "Senha redefinida com sucesso."}), 200
     else:
-        return jsonify({'error': 'Token inválido ou expirado.'}), 400
+        return jsonify({"error": "Usuário não encontrado."}), 404
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

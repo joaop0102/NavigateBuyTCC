@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import "../app/globals.css";
 
@@ -8,23 +8,13 @@ const ResetPassword: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
 
-    useEffect(() => {
-        if (router.isReady) {
-            const { token } = router.query;
-            console.log('Valor do token capturado no useEffect:', token);
-            if (typeof token === 'string') {
-                ''
-            }
-        }
-    }, [router.isReady, router.query]);
-
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const token = router.query.token;
+        const email = router.query.email as string; // Captura o e-mail da URL
 
-        if (!token || !newPassword) {
-            setMessage('Token e nova senha são obrigatórios.');
+        if (!newPassword || !email) {
+            setMessage('Nova senha e e-mail são obrigatórios.');
             return;
         }
 
@@ -36,11 +26,11 @@ const ResetPassword: React.FC = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ token, password: newPassword }),
+                body: JSON.stringify({ email, password: newPassword }), // Enviando o e-mail e a nova senha
             });
 
             if (!response.ok) {
-                throw new Error('Token expirado, tente novamente.');
+                throw new Error('Erro ao redefinir a senha. Tente novamente.');
             }
 
             setMessage('Senha redefinida com sucesso.');
@@ -51,7 +41,6 @@ const ResetPassword: React.FC = () => {
             setLoading(false);
         }
     };
-    
 
     return (
         <header className="flex flex-col md:flex-row h-screen">
