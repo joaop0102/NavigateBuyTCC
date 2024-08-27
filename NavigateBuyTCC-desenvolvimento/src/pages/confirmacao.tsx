@@ -1,7 +1,6 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router'; 
+import { useRouter } from 'next/router';
 import "../app/globals.css";
 
 const Confirmacao = () => {
@@ -9,6 +8,14 @@ const Confirmacao = () => {
   const [email, setEmail] = useState('');
   const [isEmailSent, setIsEmailSent] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    // Recuperar e-mail da URL
+    const queryEmail = router.query.email as string;
+    if (queryEmail) {
+      setEmail(decodeURIComponent(queryEmail));
+    }
+  }, [router.query.email]);
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +61,7 @@ const Confirmacao = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      router.push('/home'); 
+      router.push('/'); 
     } catch (error) {
       console.error('Erro na confirmação:', error);
     }

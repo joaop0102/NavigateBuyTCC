@@ -24,33 +24,32 @@ const Cadastro = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     try {
-        const response = await fetch('http://localhost:5003/api/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username,
-                email,
-                password,
-            }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        alert(data.message || 'Usuário cadastrado com sucesso!');
-        window.location.href = '/confirmacao';
+      const response = await fetch('http://localhost:5003/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      alert(data.message || 'Usuário cadastrado com sucesso!');
+      window.location.href = `/confirmacao?email=${encodeURIComponent(email)}`;
     } catch (error) {
-        console.error('Erro na solicitação:', error);
-        alert('Erro ao registrar usuário. Por favor, tente novamente.');
+      console.error('Erro na solicitação:', error);
+      alert('Erro ao registrar usuário. Por favor, tente novamente.');
     }
-};
-
+  };  
 
   const handleBlur = (field: string) => {
     setTouched({ ...touched, [field]: true });
