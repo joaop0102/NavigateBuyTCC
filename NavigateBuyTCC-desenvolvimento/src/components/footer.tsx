@@ -1,29 +1,59 @@
 import Link from "next/link";
+import { MdEmail } from "react-icons/md";
+import { FaInstagram, FaGithub } from "react-icons/fa6";
+import { GoPaperclip } from "react-icons/go";
 import React from "react";
 
-const Footer = () => {
+const Footer: React.FC = () => {
   return (
-      <footer className="bg-black text-white">
-        <div className="flex flex-grow justify-between items-center sm:px-12 px-4 py-12">
-          <h3 className="lg:text-1xl md:text-base sm:text-sm text-xl max-[450px]:text-xs md:mb-0 mb-6 font-semibold md:w-2/5">
-            <span className="block mb-2">
-              Todos os direitos reservados a Navigate Buy © 2024
-            </span>
-            <span className="block">Trabalho de Conclusão de Curso</span>
-          </h3>
-          <h3 className="lg:text-1xl md:text-base sm:text-sm text-xl max-[450px]:text-xs md:mb-0 mb-6 md:w-2/5">
-            <Link href="#" className="block mb-2 font-semibold hover:text-navigategreen">
-              Destaques
+    <footer className="bg-black text-white">
+      <div className="flex flex-grow justify-center space-x-56 items-center py-12 max-[650px]:space-x-10">
+        <div className="text-lg font-semibold mb-9 max-[650px]:text-sm">
+          Conheça mais sobre nós:
+          <div className="flex mt-5 space-x-6 items-center">
+            <Link href="https://www.instagram.com/navigatebuy/">
+              <FaInstagram className="text-4xl max-[650px]:text-xl" />
             </Link>
-            <Link href="#" className="block mb-2 hover:text-navigategreen">
-              Buscar Produto
+            <Link href="https://github.com/LuisaSantosSilva/NavigateBuyTCC/">
+              <FaGithub className="text-4xl max-[650px]:text-xl" />
             </Link>
-            <Link href="/avaliacao" className="block hover:text-navigategreen">
-              Avaliações e comentários
+            <Link href="mailto:navigatebuy@gmail.com">
+              <MdEmail className="text-4xl max-[650px]:text-xl" />
             </Link>
-          </h3>
+            <Link href="https://linktr.ee/navigatebuy">
+              <GoPaperclip className="text-4xl max-[650px]:text-xl" />
+            </Link>
+          </div>
         </div>
-      </footer>
+        <div className="text-lg max-[650px]:text-sm">
+          <p className="block mb-2 font-semibold">
+            Destaques
+          </p>
+          <Link href="#" className="block mb-2 hover:text-navigategreen">
+            Buscar Produto
+          </Link>
+          <Link href="../pages/avaliacao" className="block mb-2 hover:text-navigategreen">
+            <span className="hidden min-[1250px]:inline">Avaliações e comentários de consumidores</span>
+            <span className="inline min-[1250px]:hidden">Avaliações</span>
+          </Link>
+          <Link href="../pages/conversoes" className="block hover:text-navigategreen">
+            <span className="hidden min-[1250px]:inline">Conversões monetárias</span>
+            <span className="inline min-[1250px]:hidden">Conversões</span>
+          </Link>
+        </div>
+      </div>
+      <hr className="border-none bg-gradient-to-r from-navigateblue to-navigategreen h-2 w-4/5 mx-auto" />
+      <div className="flex justify-center items-center mt-10">
+        <h3 className="text-xl font-bold max-[650px]:text-sm">
+          Todos os direitos reservados a Navigate Buy © 2024
+        </h3>
+      </div>
+      <div className="flex justify-center items-center">
+        <h3 className="text-lg mb-10">
+          Trabalho de conclusão de curso
+        </h3>
+      </div>
+    </footer>
   );
 };
 

@@ -1,9 +1,8 @@
 "use client";
-
 import React, { useState, useRef, useEffect } from "react";
 import { poppins } from "../app/fonts";      
 
-const Categorias = () => {
+const Categorias: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -53,7 +52,7 @@ const Categorias = () => {
     <div className="absolute">
         <div
           ref={menuRef}
-          className="absolute mt-2 w-96 bg-white hover:bg-opacity-75 border-2 transition-all border-black rounded-lg shadow-lg z-10"
+          className="absolute mt-2 w-96 bg-white hover:bg-opacity-80 border-2 transition-all border-black rounded-lg shadow-lg z-10"
         >
           <div className="text-left ml-5 mt-5">
             <h2 className={`font-semibold text-xl mb-3 ${poppins.className}`}>
