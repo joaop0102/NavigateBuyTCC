@@ -9,24 +9,19 @@ class RennerSpider(scrapy.Spider):
     }
 
     def parse(self, response):
-        for i in response.xpath('//div[@class="ProductBox_productBoxContent__DAUwH"]'):
-            product_link = i.xpath('.//a[@class="ProductBox_productBox__juRuk"]/@href').get(default='').strip()
-            product_image = i.xpath('.//img[@class="ProductBox_productImg__B_6VV"]/@src').get(default='').strip()
-            product_title = i.xpath('.//h3[@class="ProductBox_title__x9UGh"]/text()').get(default='').strip()
-            price_original = i.xpath('.//div[@class="ProductBox_price__d7hDK"]/text()').get(default='').strip()
-            price_value = i.xpath('.//span[@class="ProductBox_installments__Hlk0q"]/text()').get(default='').strip()
-        
-            if price_value:
+        for product in response.xpath('//div[contains(@class, "ProductBox_productBoxContent__DAUwH")]'):
+            product_link = product.xpath('.//a[contains(@class, "ProductBox_productBox__juRuk")]/@href').get(default='').strip()
+            product_image = product.xpath('.//img[contains(@class, "ProductBox_productImg__B_6VV")]/@src').get(default='').strip()
+            product_title = product.xpath('.//h3[contains(@class, "ProductBox_title__x9UGh")]/text()').get(default='').strip()
+            price_original = product.xpath('.//div[contains(@class, "ProductBox_price__d7hDK")]/span/text()').get(default='').strip()
+            price_value = product.xpath('.//span[contains(@class, "ProductBox_installments__Hlk0q")]/text()').get(default='').strip()
+
+            if product_title:
                 yield {
-                    'Preço com Desconto': price_value,
-                    'Título': product_title,
-                    'Link do Produto': response.urljoin(product_link), 
-                    'Imagem do Produto': product_image
+                    'title': product_title,
+                    'link': response.urljoin(product_link),  
+                    'image': product_image,
+                    'price_original': price_original,
+                    'price_value': price_value,
                 }
-            else:
-                yield {
-                    'Preço Original': price_original,
-                    'Título': product_title,
-                    'Link do Produto': response.urljoin(product_link),  
-                    'Imagem do Produto': product_image
-                }
+

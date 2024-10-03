@@ -4,10 +4,6 @@ class MagaluSpider(scrapy.Spider):
     name = 'kl'
     start_urls = ['https://www.kalunga.com.br/busca/1?q=pulseira']
 
-    custom_settings = {
-        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
-    }
-
     def parse(self, response):
         for i in response.xpath('//div[@class="blocoproduto   col-6 col-md-4 col-xl-3"]'):
             product_link = i.xpath('.//a[@class="blocoproduto__link h-100"]/@href').get(default='').strip()

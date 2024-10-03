@@ -12,6 +12,8 @@ BOT_NAME = "kalunga"
 SPIDER_MODULES = ["kalunga.spiders"]
 NEWSPIDER_MODULE = "kalunga.spiders"
 
+# Custom user agent
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "kalunga (+http://www.yourdomain.com)"

@@ -20,14 +20,11 @@ class ObtSpider(scrapy.Spider):
 
             product_title = i.xpath('.//a[@class="showcase-item-title"]/text()').get(default='').strip()
             price_value = i.xpath('.//span[@class="price-value"]/text()').get(default='').strip()
-            stars = i.xpath('.//img[@alt="review"]/@src').get(default='').strip()
-
-          
+       
             yield {
-                'Preço Original': price_value,
+                'Preço': price_value,
                 'Título': product_title,
                 'Link do Produto': product_link,
-                'Estrelas': stars,
                 'Imagem do Produto': product_image
                 }
 
