@@ -2,11 +2,11 @@ import scrapy
 
 class MagaluSpider(scrapy.Spider):
     name = 'kl'
-    start_urls = ['https://www.kalunga.com.br/busca/1?q=pulseira']
+    start_urls = ['https://www.kalunga.com.br/busca/1?q=cola']
 
     def parse(self, response):
         for i in response.xpath('//div[@class="blocoproduto   col-6 col-md-4 col-xl-3"]'):
-            product_link = i.xpath('.//a[@class="blocoproduto__link h-100"]/@href').get(default='').strip()
+            product_link = response.urljoin(i.xpath('.//a[@class="blocoproduto__link h-100"]/@href').get(default='').strip())
 
             product_image = i.xpath('.//img[@class="blocoproduto__image"]/@src').get()
             if not product_image:

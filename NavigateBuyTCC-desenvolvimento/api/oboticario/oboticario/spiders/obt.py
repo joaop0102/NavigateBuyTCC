@@ -5,7 +5,7 @@ class ObtSpider(scrapy.Spider):
     start_urls = ['https://www.boticario.com.br/cabelos/shampoo/']
 
     def parse(self, response):
-        for i in response.xpath('//div[@class="showcase-item   js-event-product-click "]'):
+        for i in response.xpath('//div[@class="showcase-item   js-event-product-click"]'):
             product_link = i.xpath('.//a[@class="showcase-item-image "]/@href').get(default='').strip()
 
             product_image = i.xpath('.//img[@class="showcase-image"]/@src').get()
