@@ -16,6 +16,7 @@ class MagaluSpider(scrapy.Spider):
            
 
             yield {
+                    'Loja': 'C&A',
                     'Preço': price_value,
                     'Preço Exclusivo': price_exclusive,
                     'Título': product_title,
