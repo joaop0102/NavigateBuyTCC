@@ -1,0 +1,40 @@
+Date: Sat, 05 Oct 2024 12:00:20 GMT
+Content-Type: text/html; charset=utf-8
+Set-Cookie: noe_freight=AUTO; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: noe_hub_shipping_enabled=1; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: toggle_wishlist=false; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: FCCDCF=1; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: ml2_redirect_8020=0; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: FCNEC=1; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: mixer_shipping=AUTO; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: mixer_hub_shipping=true; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: toggle_wishlist=false; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: toggle_pdp_seller_score=true; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: toggle_vwo=true; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: toggle_agatha=true; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: toggle_ads=true; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: toggle_new_service_page=true; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: toggle_search_ads=true; Domain=magazineluiza.com.br; Path=/
+Set-Cookie: __uzma=382abf74-65f5-4332-a1c4-66bd467ac3c6; HttpOnly; path=/; Expires=Sat, 05-Apr-25 12:00:19 GMT ; Max-Age=15724800; SameSite=Lax
+Set-Cookie: __uzmb=1728129619; HttpOnly; path=/; Expires=Sat, 05-Apr-25 12:00:19 GMT ; Max-Age=15724800; SameSite=Lax
+Set-Cookie: __uzme=5748; HttpOnly; path=/; Expires=Sat, 05-Apr-25 12:00:19 GMT ; Max-Age=15724800; SameSite=Lax
+Set-Cookie: __uzmc=812591045480; HttpOnly; path=/; Expires=Sat, 05-Apr-25 12:00:19 GMT ; Max-Age=15724800; SameSite=Lax
+Set-Cookie: __uzmd=1728129619; HttpOnly; path=/; Expires=Sat, 05-Apr-25 12:00:19 GMT ; Max-Age=15724800; SameSite=Lax
+Set-Cookie: MLPARCEIRO=0; domain=.magazineluiza.com.br; Max-Age=2592000; Path=/
+Set-Cookie: az_asm_20240904=T5hBBdP2c/V+9WZpTSCAhqfGVsUcCh7wbM7lFePE5axKJv7H3jT97F334u0qLp0BwW3meIXn2o8v1oOr; Domain=www.magazineluiza.com.br; Path=/; Max-Age=86400; Secure; HttpOnly; SameSite=Lax
+Set-Cookie: az_botm_20240904=ccb406af963b42fe6ebccd03e713ef1f; Domain=www.magazineluiza.com.br; Path=/; Max-Age=86400; Secure; HttpOnly; SameSite=Lax
+Strict-Transport-Security: max-age=31536000; preload
+X-Xss-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Content-Security-Policy: frame-ancestors 'self' https://*.mglu.io https://*.magalu.com https://*.luizalabs.com https://*.magazineluiza.com.br;
+Access-Control-Allow-Origin: https://mixer-desktop.magazineluiza.com.br
+Access-Control-Allow-Method: GET
+Vary: Accept-Encoding, Origin
+Etag: "7v6rnte9t9hiaa"
+Cache-Control: max-age=1800
+Content-Encoding: gzip
+Via: 1.1 google
+X-Azion-Request-Id: ccb406af963b42fe6ebccd03e713ef1f-911c861c
+X-Azion-Edge-Pop: NET
+Expires: Sat, 05 Oct 2024 12:30:20 GMT
