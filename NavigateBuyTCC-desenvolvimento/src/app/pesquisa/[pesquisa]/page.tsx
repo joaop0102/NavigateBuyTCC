@@ -175,7 +175,7 @@ const Pesquisa: React.FC = () => {
                         {index + 1}
                     </div>
                     {index < endPage && (
-                        <span className="linha-divisoria h-12 w-[2px] bg-[#0C0440]"></span> // Oculta em telas pequenas
+                        <span className="linha-divisoria h-12 w-[2px] bg-[#0C0440]"></span> 
                     )}
                 </label>
             );
@@ -186,7 +186,7 @@ const Pesquisa: React.FC = () => {
                 <div key="next-ellipsis" className="flex items-center">
                     <span className="h-12 w-[2px] bg-[#0C0440] mr-2 hidden md:block"></span>
                     <span
-                        className="bloco-nav cursor-pointer ml-2"
+                        className="bloco-nav cursor-pointer mr-2"
                         onClick={() => handlePageChange(endPage + 1)}>
                         ...
                     </span>
@@ -287,7 +287,7 @@ const Pesquisa: React.FC = () => {
           <div className="flex justify-center items-center">
             {page > 0 && (
               <a onClick={() => handlePageChange(page - 1)} className="text-white seta-nav mr-2">
-                <MdKeyboardArrowLeft color="black" size={35} />
+                <MdKeyboardArrowLeft size={35} />
               </a>
             )}
             <div className="flex items-center barra-nav">
@@ -295,7 +295,7 @@ const Pesquisa: React.FC = () => {
             </div>
             {page < totalPages - 1 && (
               <a onClick={() => handlePageChange(page + 1)} className="text-white flex items-center">
-                <MdKeyboardArrowRight size={20} color="black" className="bg-white seta-nav-esq ml-2" />
+                <MdKeyboardArrowRight size={20} className="bg-white seta-nav-esq ml-2" />
               </a>
             )}
           </div>
