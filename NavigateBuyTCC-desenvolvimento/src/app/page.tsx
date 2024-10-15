@@ -23,6 +23,7 @@ const Home = () => {
   const [showArrows, setShowArrows] = useState(false);
   const [isScrollable, setIsScrollable] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const [categoria, setCategoria] = useState("Acessórios");
 
   const updateScrollState = () => {
     if (scrollContainerRef.current) {
@@ -79,7 +80,7 @@ const Home = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar onCategorySelect={setCategoria}/>
       <header className='overflow-hidden select-none'>
         <div className="flex justify-center items-center mx-auto lg:py-44 md:py-20 bg-navigateblue">
           <div className="flex flex-col lg:flex-row justify-center items-center">

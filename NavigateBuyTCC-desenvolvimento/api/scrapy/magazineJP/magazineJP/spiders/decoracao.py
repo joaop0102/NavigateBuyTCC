@@ -27,8 +27,8 @@ class MagaluSpider(scrapy.Spider):
             product_image = product.xpath('.//img[@data-testid="image"]/@src').get(default='').strip()
             product_title = product.xpath('.//h2[@data-testid="product-title"]/text()').get(default='').strip()
             price_value = product.xpath('.//p[@data-testid="price-value"]/text()').get(default='').strip().replace('R$', '').strip()
-            stars_text = product.xpath('.//span[contains(@class, "sc-cezyBN")]/text()').get(default='').strip()
-            evaluations_text = product.xpath('.//span[contains(@class, "sc-cezyBN")]/text()').get(default='').strip()
+            stars_text = product.xpath('.//span[contains(@class, "sc-cezyBN")]/text()').get(default='0.0').strip()
+            evaluations_text = product.xpath('.//span[contains(@class, "sc-cezyBN")]/text()').get(default='sem').strip()
 
             if stars_text:
                 stars = stars_text.split()[0]
@@ -42,13 +42,13 @@ class MagaluSpider(scrapy.Spider):
                 evaluations = ''
 
             yield {
-                'Loja': 'Magazine Luiza',
-                'Título': product_title,
-                'Preço': price_value,
-                'Link do Produto': product_link,
-                'Estrelas': stars,
-                'Avaliações': evaluations,
-                'Imagem do Produto': product_image
+                'loja': 'Magazine Luiza',
+                'título': product_title,
+                'preço': price_value,
+                'link': product_link,
+                'estrelas': stars,
+                'avaliações': evaluations,
+                'imagem': product_image
             }
 
         next_page = response.xpath('//a[@data-testid="arrow-right"]/@href').get()

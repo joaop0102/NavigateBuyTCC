@@ -1,6 +1,6 @@
 import scrapy
 
-class RiachueloSpider(scrapy.Spider):
+class BesniSpider(scrapy.Spider):
     name = "decor"
     start_urls = [
         # Decoracao
@@ -28,11 +28,13 @@ class RiachueloSpider(scrapy.Spider):
 
                 if product_link and product_title and price_value and product_image:
                     yield {
-                        'Loja': 'Besni',
-                        'Preço Original': price_value.strip(),
-                        'Título': product_title.strip(),
-                        'Link do Produto': response.urljoin(product_link),
-                        'Imagem do Produto': product_image.strip(),
+                        'loja': 'Besni',
+                        'preço': price_value.strip(),
+                        'título': product_title.strip(),
+                        'link': response.urljoin(product_link),
+                        'estrelas': '0.0',
+                        'avaliações': 'sem',
+                        'imagem': product_image.strip(),
                     }
 
             next_page = response.xpath('//a[@data-testid="arrow-right"]/@href').get()
@@ -51,9 +53,11 @@ class RiachueloSpider(scrapy.Spider):
 
         if product_title and product_price and product_image:
             yield {
-                'Loja': 'Besni',
-                'Preço Original': product_price.strip(),
-                'Título': product_title.strip(),
-                'Link do Produto': response.url,
-                'Imagem do Produto': product_image.strip(),
+                'loja': 'Besni',
+                'preço': product_price.strip(),
+                'título': product_title.strip(),
+                'link': response.url,
+                'estrelas': '0.0',
+                'avaliações': 'sem',
+                'imagem': product_image.strip(),
             }

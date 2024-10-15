@@ -46,6 +46,7 @@ acessorios_paths = [
     os.path.join(project_root, 'scrapy', 'mercadolivre', 'data', 'Acessorios.json'),
     os.path.join(project_root, 'scrapy', 'magazineJP', 'data', 'Acessorio.json'),
     os.path.join(project_root, 'scrapy', 'casasbahia', 'data', 'Acessorio.json'),
+    os.path.join(project_root, 'scrapy', 'besni', 'data', 'Acessorio.json'),
     os.path.join(project_root, 'scrapy', 'kalunga', 'data', 'Acessorio.json'),
     os.path.join(project_root, 'scrapy', 'besni', 'data', 'Acessorio.json')
 ]
@@ -69,10 +70,10 @@ juntar_arquivos(bebes_paths, os.path.join(listas_json_dir, 'Bebes.json'))
 beleza_paths = [
     os.path.join(project_root, 'scrapy', 'americanas', 'data', 'beleza.json'),
     os.path.join(project_root, 'scrapy', 'casasbahia', 'data', 'Beleza.json'),
+    os.path.join(project_root, 'scrapy', 'besni', 'data', 'Beleza.json'),
     os.path.join(project_root, 'scrapy', 'magazineJP', 'data', 'Beleza.json'),
     os.path.join(project_root, 'scrapy', 'mercadolivre', 'data', 'Beleza.json'),
     os.path.join(project_root, 'scrapy', 'oboticario', 'data', 'Beleza.json'),
-    os.path.join(project_root, 'scrapy', 'besni', 'data', 'Beleza.json'),
     os.path.join(project_root, 'scrapy', 'ultrafarma', 'data', 'beleza.json')
 ]
 
@@ -140,6 +141,7 @@ mercadoFarmacia_paths = [
     os.path.join(project_root, 'scrapy', 'americanas', 'data', 'MF.json'),
     os.path.join(project_root, 'scrapy', 'casasbahia', 'data', 'Mercado_Farmacia.json'),
     os.path.join(project_root, 'scrapy', 'besni', 'data', 'Mercado_Farmacia.json'),
+    os.path.join(project_root, 'scrapy', 'besni', 'data', 'Mercado_Farmacia.json'),
     os.path.join(project_root, 'scrapy', 'kalunga', 'data', 'Mercado_Farmacia.json'),
     os.path.join(project_root, 'scrapy', 'magazineJP', 'data', 'Mercado_Farmacia.json'),
     os.path.join(project_root, 'scrapy', 'mercadolivre', 'data', 'Mercado_Farmacia.json'),
@@ -173,8 +175,8 @@ juntar_arquivos(pets_paths, os.path.join(listas_json_dir, 'Pets.json'))
 # Categoria Roupas
 roupas_paths = [
     os.path.join(project_root, 'scrapy', 'americanas', 'data', 'roupa.json'),
-    os.path.join(project_root, 'scrapy', 'casasbahia', 'data', 'Roupas.json'),
-    os.path.join(project_root, 'scrapy', 'besni', 'data', 'Roupa.json'),
+    os.path.join(project_root, 'scrapy', 'casasbahia', 'data', 'Roupa.json'),
+    os.path.join(project_root, 'scrapy', 'besni', 'data', 'Roupas.json'),
     os.path.join(project_root, 'scrapy', 'centauro', 'data', 'roupa.json'),
     os.path.join(project_root, 'scrapy', 'kalunga', 'data', 'Roupas.json'),
     os.path.join(project_root, 'scrapy', 'magazineJP', 'data', 'Roupas.json'),
