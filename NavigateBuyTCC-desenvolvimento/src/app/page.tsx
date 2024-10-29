@@ -13,14 +13,20 @@ const cards = [
   { id: 1, title: 'Reclame Aqui', url: 'https://www.reclameaqui.com.br' },
   { id: 2, title: 'Magazine Luiza', url: 'https://www.magazineluiza.com.br' },
   { id: 3, title: 'Mercado Livre', url: 'https://www.mercadolivre.com.br' },
-  { id: 4, title: 'Casas Bahia', url: 'https://www.casasbahia.com.br/' },
-  { id: 5, title: 'Americanas', url: 'https://www.americanas.com.br/#modal-splashscreen' },
+  { id: 4, title: 'Americanas', url: 'https://www.americanas.com.br/' },
+  { id: 5, title: 'Casas Bahia', url: 'https://www.casasbahia.com.br/' },
+  { id: 6, title: 'Centauro', url: 'https://www.centauro.com.br/' },
+  { id: 7, title: 'Besni', url: 'https://www.besni.com.br/' },
+  { id: 8, title: 'Marisa', url: 'https://www.marisa.com.br/' },
+  { id: 9, title: 'Kalunga', url: 'https://www.kalunga.com.br/' },
+  { id: 10, title: 'Ultrafarma', url: 'https://www.ultrafarma.com.br/' },
+  { id: 11, title: 'Oboticário', url: 'https://www.boticario.com.br/' },
 ];
 
 const Home = () => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [showArrows, setShowArrows] = useState(false);
+  const [showArrows, setShowArrows] = useState(true);
   const [isScrollable, setIsScrollable] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -35,11 +41,11 @@ const Home = () => {
   const handleResize = () => {
     const width = window.innerWidth;
     if (width <= 900) {
-      setShowArrows(false);
-      setIsScrollable(true);
+      setShowArrows(true);
+      setIsScrollable(false); 
     } else {
       setShowArrows(true);
-      setIsScrollable(false);
+      setIsScrollable(false); 
     }
     updateScrollState();
   };
@@ -88,7 +94,7 @@ const Home = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}>
               <div className='text-center lg:text-left ml-0 md:ml-10 space-y-14 p-28'>
-                <h1 className={`lg:mt-0 mt-10 text-5xl max-xl:text-4xl font-medium leading-normal`}>
+                <h1 className={`lg:mt-0 mt-10 text-5xl max-xl:text-4xl max-md:text-3xl font-medium leading-normal`}>
                   <strong className={`text-outline text-white ${poppins.className}`}>
                     Navegue com simplicidade e pesquise com mais segurança
                   </strong>
@@ -103,8 +109,12 @@ const Home = () => {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}>
-              <img src={'/img/note.png'} alt="Exemplo" className="lg:max-w-xl md:max-w-sm object-cover md:mt-0 mt-10" />
-            </Animated>
+              <img
+                src={'/img/note.png'}
+                alt="Exemplo"
+                className="lg:max-w-xl md:max-w-sm object-cover md:mt-0 mt-10 hidden md:block"
+              />
+            </Animated> 
           </div>
         </div>
         <div className='mt-8 mx-24 bg-white'>
@@ -121,8 +131,7 @@ const Home = () => {
                   className={`absolute left-0 top-1/2 transform -translate-y-1/2 ${canScrollLeft ?
                     'hover:bg-opacity-80 hover:bg-slate-900' : 'hidden'} text-green-700 transition-all duration-500 rounded-full p-2 md:p-3 lg:p-4 z-10 text-lg md:text-xl lg:text-2xl`}
                   onClick={scrollLeft}
-                  disabled={!canScrollLeft}
-                >
+                  disabled={!canScrollLeft}>
                   &lt;
                 </button>
                 <button
@@ -152,7 +161,7 @@ const Home = () => {
             </div>
           </div>
           <div className='mt-14'>
-            <Animated initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
+            <Animated initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1}}>
               <h2 className={`text-left text-lg md:text-xl lg:text-2xl mb-2 ${poppins.className}`}>Ideias de categorias de pesquisas</h2>
             </Animated>
           </div>
