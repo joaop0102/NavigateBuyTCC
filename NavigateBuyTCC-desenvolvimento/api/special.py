@@ -1,234 +1,199 @@
-from email.mime.multipart import MIMEMultipart
+from flask import current_app
 from email.mime.text import MIMEText
-import random
+from email.mime.multipart import MIMEMultipart
+from itsdangerous import URLSafeTimedSerializer
 import smtplib
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-import mysql.connector
-from mysql.connector import Error
 
-app = Flask(__name__)
-app.config['SESSION_TYPE'] = 'filesystem'
-app.secret_key = 'f3280ebb-45ac-4acb-814d-9ca9ea60e1e8'
-CORS(app)
+def corpo_email_cadastro(code):
+    return f"""
+        <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; padding: 20px;">
+            <!-- Cabeçalho -->
+            <div style="background: linear-gradient(to right, #0c0440, #0C8249); padding: 20px; text-align: center; color: #FFFFFF;">
+                <h2 style="margin: 0;">Código de Confirmação</h2><hr style="width: 50%; color: #FFFFFF;">
+            </div>
+            <div style="background-color: #F5F5F5;">
+                <!-- Mensagem de boas-vindas -->
+                <div style="padding: 20px; text-align: center;">
+                    <h3 style="color: #000000;">Seja Bem Vindo(a) ao <span style="color: #0C0440;">Navigate <span style="color: #0C8249;">Buy</span> </span></h3>
+                </div>
+                
+                <hr style="width:100%; height:3px; border-width:0; background-color:#000000;">
+                
+                <!-- Corpo do e-mail -->
+                <div style="padding: 20px; text-align: left;">
+                    <p style="font-size: 18px; font-weight: bold; color: #000000;">
+                        Olá, ficamos felizes de termos você conosco,
+                    </p>
+                    <p style="font-size: 16px; color: #000000;">
+                        Aqui você pode comparar preços, analisar avaliações de outros consumidores e encontrar as melhores ofertas em lojas populares com boa reputação.
+                    </p>
+                    <p style="font-size: 12px; color: #000000;">
+                        Ao utilizar nosso sistema, você concorda com nossos termos de uso. Não se esqueça de lê-los.
+                    </p>
+                </div>
 
-# Configurações do banco de dados
-db_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '',
-    'database': 'bdnavigate'
-}
+                <hr style="width:75%; height:3px; border-width:0; background-color:#000000;">
 
-# Conexão do banco de dados
-def get_db_connection():
-    try:
-        connection = mysql.connector.connect(**db_config)
-        return connection
-    except Error as e:
-        print(f"Erro ao conectar ao MySQL: {e}")
-        return None
+                <!-- Código de confirmação -->
+                <div style="padding: 20px; text-align: center;">
+                    <h3 style="color: #000000;">Seu código de confirmação é: <strong style="color: #0C8249;">{code}</strong></h3>
+                    <p style="font-size: 18px; color: #000000;">Use este código para confirmar seu email.</p>
+                </div>
 
-# Configuração do CORS para evitar erros
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-    response.headers.add('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, DELETE')
-    return response
+                <hr style="width:75%; height:3px; border-width:0; background-color:#000000;">
 
-# Configuração do login 
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
+                <!-- Rodapé -->
+                <div style="padding: 18px; text-align: center;">
+                    <p style="font-size: 14px; font-weight: bold; color: #000000;">Navegue com simplicidade e pesquise com mais segurança!</p>
+                    <div style="padding: 10px; text-align: left;">
+                        <p style="font-size: 14px; color: #000000;">Atenciosamente,<br>Equipe Navigate Buy</p>
+                    </div>
+                </div>
+                
+                <!-- Direitos reservados -->
+                <div style="background: #000000; padding: 20px; text-align: center; color: #FFFFFF;">
+                    <hr style="width:75%; height:3px; border-width:0; background: linear-gradient(to right, #0c0440, #0C8249);">
+                    <p style="font-size: 12px; margin: 0;">Todos os direitos reservados a Navigate Buy © 2024</p><br>
+                    <p style="font-size: 12px; margin: 0;">Trabalho de Conclusão de Curso</p>
+                </div>
+            </div>    
+        </div>
+            """
 
-# Define a classe User que representa um usuário no sistema
-class User(UserMixin):
-    def __init__(self, id, username, password):
-        self.id = id 
-        self.username = username 
-        self.password = password 
 
-# Função que carrega um usuário a partir de um ID
-@login_manager.user_loader
-def load_user(user_id):
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify({"message": "Erro ao conectar ao banco de dados"}), 500
-    cursor = None
-    try:
-        cursor = connection.cursor(dictionary=True)
-        query = "SELECT * FROM users WHERE id=%s"
-        cursor.execute(query, (user_id,))  
-        user = cursor.fetchone() 
-        if user:
-            return User(user['id'], user['username'], user['password'])
-        return None
-    finally:
-        if cursor:
-            cursor.close()
-        if connection and connection.is_connected():
-            connection.close()
+def corpo_email_senha(link_redefinicao, email):
+    # Criação do serializer com a chave secreta da aplicação
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
 
-# Define a rota para o endpoint de registro de usuários
-@app.route('/useradd', methods=['POST'])
-def register_user():
-    try:
-        data = request.get_json()
-        username = data.get('username')  
-        email = data.get('email')  
-        password = data.get('password')
+    # Gerando o token para o e-mail do usuário
+    token = serializer.dumps(email, salt='password-reset-salt')
 
-        if not username or not email or not password:
-            return jsonify({"message": "Todos os campos são obrigatórios!"}), 400
-        
-        if len(password) < 8:
-            return jsonify({"message": "A senha deve ter pelo menos 8 caracteres."}), 400
-        
+    link_redefinicao = f"http://localhost:3000/cadastro_login/login/redefinirSenha?token={token}&email={email}"
+    return f"""
+        <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; padding: 20px;">
+            <!-- Cabeçalho -->
+            <div style="background: linear-gradient(to right, #0c0440, #0C8249); padding: 20px; text-align: center; color: #FFFFFF;">
+                <h2 style="margin: 0;">Redefinição de Senha</h2><hr style="width: 50%; color: #FFFFFF;">
+            </div>
 
-        connection = get_db_connection()
-        if connection is None:
-            return jsonify({"message": "Erro ao conectar ao banco de dados"}), 500
-        
-        cursor = connection.cursor(dictionary=True)
-        query = "SELECT email FROM users WHERE email=%s"
-        cursor.execute(query, (email,))
-        user = cursor.fetchone()
-        
-        if user:
-            user_email = user['email']
+            <div style="background-color: #F5F5F5;">
+                <!-- Mensagem de boas-vindas -->
+                <div style="padding: 20px; text-align: center;">
+                    <h3 style="color: #000000;">Seja Bem Vindo(a) ao <span style="color: #0C0440;">Navigate <span style="color: #0C8249;">Buy</span> </span></h3>
+                </div>
+                
+                <hr style="width:100%; height:3px; border-width:0; background-color:#000000;">
+                
+                <!-- Corpo do e-mail -->
+                <div style="padding: 20px; text-align: left;">
+                    <p style="font-size: 18px; font-weight: bold; color: #000000;">
+                        Olá, ficamos felizes de termos você conosco,
+                    </p>
+                    <p style="font-size: 16px; color: #000000;">
+                        Aqui você pode comparar preços, analisar avaliações de outros consumidores e encontrar as melhores ofertas em lojas populares com boa reputação.
+                    </p>
+                    <p style="font-size: 12px; color: #000000;">
+                        Ao utilizar nosso sistema, você concorda com nossos termos de uso. Não se esqueça de lê-los.
+                    </p>
+                </div>
 
-            if user_email == email:
-                return jsonify({"message": "Email já cadastrado"}), 400
-            
-        query = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-        cursor.execute(query, (username, email, password))
-        connection.commit()
-        return jsonify({"message": "Registro feito com sucesso!"}), 201
-    except Error as e:
-        print(f"Erro ao executar consulta: {e}")
-        return jsonify({"message": "Erro ao se registrar", "Tente novamente": str(e)}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if connection and connection.is_connected():
-            connection.close()
+                <hr style="width:75%; height:3px; border-width:0; background-color:#000000;">
 
-# Rota para o endpoint de login
-@app.route('/login', methods=['POST'])
-def login():
-    data = request.json 
-    email = data.get('email')  
-    password = data.get('password')  
-    
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify({"message": "Erro ao conectar ao banco de dados"}), 500
-    
-    cursor = None
-    try:
-        cursor = connection.cursor(dictionary=True)
-        query = "SELECT id, email, password FROM users WHERE email=%s"
-        cursor.execute(query, (email,))  
-        user = cursor.fetchone()
-        
-        if user:
-            user_id, user_email, user_password = user['id'], user['email'], user['password']
+                <!-- Botão de Redefinição -->
+                <div style="padding: 20px; text-align: center;">
+                    <h3 style="color: #000000;">Clique no botão abaixo para redefinir sua senha:</h3>
+                    <a href="{link_redefinicao}" style="padding: 10px 20px; background-color: #0C8249; color: #FFFFFF; border-radius: 5px;">Redefinir Senha</a>
+                    <p style="font-size: 18px; color: #000000;">Use este link para redefinir sua senha.</p>
+                    <p style="font-size: 18px; color: #000000;">Se você não solicitou a redefinição de senha, por favor, ignore este email.</p>
+                </div>
 
-            if user_password == password:
-                user_obj = User(user_id, user_email, user_password)
-                login_user(user_obj)
-                return jsonify({"message": "Login bem sucedido"}), 200
-            else:
-                return jsonify({"message": "Senha incorreta"}), 401
-        else:
-            return jsonify({"message": "Cadastro não existente"}), 404
-    finally:
-        if cursor:
-            cursor.close()
-        if connection and connection.is_connected():
-            connection.close()
+                <hr style="width:75%; height:3px; border-width:0; background-color:#000000;">
 
-@app.route('/logout', methods=['POST'])
-@login_required
-def logout():
+                <!-- Rodapé -->
+                <div style="padding: 18px; text-align: center;">
+                    <p style="font-size: 14px; font-weight: bold; color: #000000;">Navegue com simplicidade e pesquise com mais segurança!</p>
+                    <div style="padding: 10px; text-align: left;">
+                        <p style="font-size: 14px; color: #000000;">Atenciosamente,<br>Equipe Navigate Buy</p>
+                    </div>
+                </div>
+                
+                <!-- Direitos reservados -->
+                <div style="background: #000000; padding: 20px; text-align: center; color: #FFFFFF;">
+                    <hr style="width:75%; height:3px; border-width:0; background: linear-gradient(to right, #0c0440, #0C8249);">
+                    <p style="font-size: 12px; margin: 0;">Todos os direitos reservados a Navigate Buy © 2024</p><br>
+                    <p style="font-size: 12px; margin: 0;">Trabalho de Conclusão de Curso</p>
+                </div>
+            </div>    
+        </div>    
+        """
 
-    logout_user()
-    return jsonify({'message': 'Logout realizado com sucesso!'}), 200          
 
-# Rota para o endpoint editar-perfil
-@app.route('/editar-perfil', methods=['PUT'])
-def editar_perfil():
+def corpo_email_favoritos(user):
+    return f"""
+        <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; padding: 20px;">
+            <!-- Cabeçalho -->
+            <div style="background: linear-gradient(to right, #0c0440, #0C8249); padding: 20px; text-align: center; color: #FFFFFF;">
+                <h2 style="margin: 0;">Alertas de Produtos Favoritados</h2><hr style="width: 50%; color: #FFFFFF;">
+            </div>
 
-    data = request.get_json()
-    id = data.get('id')
-    username = data.get('username')
-    password = data.get('password')
+            <div style="background-color: #F5F5F5;">
+                <!-- Mensagem principal -->
+                <div style="padding: 20px; text-align: center;">
+                    <h3 style="color: #000000;">Novidades sobre seus produtos favoritos no <span style="color: #0C0440;">Navigate <span style="color: #0C8249;">Buy</span></span></h3>
+                </div>
+                
+                <hr style="width:100%; height:3px; border-width:0; background-color:#000000;">
 
-    if not id or not username or not password:
-        return jsonify({"message": "Todos os campos são obrigatórios!"}), 400
-        
-    if len(password) < 8:
-        return jsonify({"message": "A senha deve ter pelo menos 8 caracteres."}), 400
+                <!-- Corpo do e-mail -->
+                <div style="padding: 20px; text-align: left;">
+                    <p style="font-size: 18px; font-weight: bold; color: #000000;">
+                        Olá, {user.username}!
+                    </p>
+                    <p style="font-size: 16px; color: #000000;">
+                        Aqui estão as últimas atualizações sobre seus produtos favoritos. Não perca as melhores ofertas disponíveis este mês!
+                    </p>
+                </div>
 
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify({"message": "Erro ao conectar ao banco de dados"}), 500
+                <hr style="width:75%; height:3px; border-width:0; background-color:#000000;">
 
-    cursor = None
-    try:
-        cursor = connection.cursor(dictionary=True)
-        query = "UPDATE users SET username=%s, password=%s WHERE id=%s"
-        cursor.execute(query, (username, password, id))  
-        
-        connection.commit()
-        return jsonify({"message": "Perfil atualizado com sucesso!"}), 201
-    except Error as e:
-        print(f"Erro ao executar consulta: {e}")
-        return jsonify({"message": "Erro ao editar seu perfil", "Tente novamente": str(e)}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if connection and connection.is_connected():
-            connection.close()
+                <!-- Botão de ver favoritos -->
+                <div style="padding: 20px; text-align: center;">
+                    <a href="http://localhost:3000/perfil/favoritos" style="padding: 10px 20px; background-color: #0C8249; color: #FFFFFF; border-radius: 5px;">Ver Produtos Favoritos</a>
+                </div>
 
-# Rota para o endpoint buscar dados do perfil
-@app.route('/perfil', methods=['GET'])
-@login_required
-def get_perfil():
-    username = request.args.get('username')
-    email = request.args.get('email')
-    password = request.args.get('password')
+                <hr style="width:75%; height:3px; border-width:0; background-color:#000000;">
 
-    if not username and not email and not password:
-        return jsonify({'error': 'Pelo menos um parâmetro é necessário.'}), 400
+                <!-- Rodapé -->
+                <div style="padding: 18px; text-align: center;">
+                    <p style="font-size: 14px; font-weight: bold; color: #000000;">Navegue com simplicidade e pesquise com mais segurança!</p>
+                    <div style="padding: 10px; text-align: left;">
+                        <p style="font-size: 14px; color: #000000;">Atenciosamente,<br>Equipe Navigate Buy</p>
+                    </div>
+                </div>
+                
+                <!-- Direitos reservados -->
+                <div style="background: #000000; padding: 20px; text-align: center; color: #FFFFFF;">
+                    <hr style="width:75%; height:3px; border-width:0; background: linear-gradient(to right, #0c0440, #0C8249);">
+                    <p style="font-size: 12px; margin: 0;">Todos os direitos reservados a Navigate Buy © 2024</p><br>
+                    <p style="font-size: 12px; margin: 0;">Trabalho de Conclusão de Curso</p>
+                </div>
+            </div>    
+        </div>    
+        """
 
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify({"message": "Erro ao conectar ao banco de dados"}), 500
+def enviar_alerta_favoritos(email, user):
+    corpo_email = corpo_email_favoritos(user)
+    enviar_email(email, "Alertas de Produtos Favoritados", corpo_email)
 
-    cursor = None
-    try:
-        cursor = connection.cursor(dictionary=True)
-        query = "SELECT * FROM users WHERE username=%s OR email=%s OR password=%s"
-        cursor.execute(query, (username, email, password))
-        user = cursor.fetchone()
 
-        if user:
-            return jsonify({
-                'username': user['username'],
-                'email': user['email']
-            }), 200
-        return jsonify({'error': 'Usuário não encontrado.'}), 404
-    except Error as e:
-        print(f"Erro ao executar consulta: {e}")
-        return jsonify({"message": "Erro ao inserir dados do seu perfil", "Tente novamente": str(e)}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if connection and connection.is_connected():
-            connection.close()
+def enviar_confirmacao_cadastro(email, user):
+    corpo_email = corpo_email_cadastro(user)
+    enviar_email(email, "Confirmação de Cadastro", corpo_email)
+
+
+def enviar_recuperacao_senha(email, user):
+    corpo_email = corpo_email_senha(user)
+    enviar_email(email, "Recuperação de Senha", corpo_email)
 
 # Função para enviar o email
 def enviar_email(destinatario, assunto, corpo):
@@ -239,7 +204,9 @@ def enviar_email(destinatario, assunto, corpo):
     msg['From'] = remetente
     msg['To'] = destinatario
     msg['Subject'] = assunto
-    msg.attach(MIMEText(corpo, 'html'))
+    
+    corpo_email = MIMEText(corpo.encode('utf-8'), 'html', 'utf-8')
+    msg.attach(corpo_email)
 
     try:
         with smtplib.SMTP('smtp.gmail.com', 587) as server:
@@ -249,158 +216,3 @@ def enviar_email(destinatario, assunto, corpo):
         print("E-mail enviado com sucesso.")
     except Exception as e:
         print(f"Erro ao enviar email: {e}")
-
-# Adiciona suporte para requisições OPTIONS
-@app.route('/request-password-reset', methods=['OPTIONS', 'POST'])
-def request_password_reset():
-    if request.method == 'OPTIONS':
-        return '', 200
-
-    data = request.get_json()
-    if not data or 'email' not in data:
-        return jsonify({"error": "Dados de entrada inválidos."}), 400
-
-    email = data['email']
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify({"message": "Erro ao conectar ao banco de dados"}), 500
-    
-    cursor = connection.cursor(dictionary=True)
-    user = cursor.fetchone()
-
-    if user:
-        link_redefinicao = f"http://localhost:3000/redefinir_senha?email={email}"
-        corpo_email = f"""
-        <h3>Redefinição de Senha</h3>
-        <p>Clique no botão abaixo para redefinir sua senha:</p>
-        <a href="{link_redefinicao}" style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Redefinir Senha</a>
-        <p>Se você não solicitou a redefinição de senha, por favor, ignore este email.</p>
-        """
-
-        enviar_email(email, "Redefinição de Senha - Navigate Buy", corpo_email)
-        return jsonify({"message": "Email de redefinição de senha enviado."}), 200
-    else:
-        return jsonify({"error": "Email não encontrado."}), 404
-    
-# Endpoint para redefinir a senha
-@app.route('/reset_password', methods=['POST'])
-def reset_password():
-    data = request.get_json()
-    id = data.get('id')
-    email = data.get('email')
-    new_password = data.get('password')
-
-    if not email or not new_password:
-        return jsonify({"error": "Dados insuficientes."}), 400
-
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify({"message": "Erro ao conectar ao banco de dados"}), 500
-
-    cursor = None
-    try:
-        cursor = connection.cursor(dictionary=True)
-        query = "UPDATE users SET password=%s WHERE id=%s"
-        cursor.execute(query, (new_password, id))  
-    
-        connection.commit()
-        return jsonify({"message": "Senha redefinida com sucesso."}), 200
-    except Error as e:
-        print(f"Erro ao executar consulta: {e}")
-        return jsonify({"message": "Erro ao requisitar nova senha", "Tente novamente": str(e)}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if connection and connection.is_connected():
-            connection.close()
-
-# Rota para enviar o código de confirmação
-@app.route('/send_code', methods=['OPTIONS', 'POST'])
-def send_code():
-    if request.method == 'OPTIONS':
-        return '', 200
-    data = request.get_json()
-    email = data.get('email')
-
-    if not email:
-        return jsonify({"error": "E-mail é obrigatório."}), 400
-
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify({"message": "Erro ao conectar ao banco de dados"}), 500
-
-    cursor = None
-    try:    
-        cursor = connection.cursor(dictionary=True)
-        query = "SELECT email FROM users WHERE email=%s"
-        cursor.execute(query, (email,))
-        user = cursor.fetchone()
-
-        if not user:
-            return jsonify({"error": "E-mail não encontrado."}), 404
-        
-        # Gerar o código de confirmação
-        code = str(random.randint(100000, 999999))
-        query = "SELECT id, code FROM confirmations WHERE email=%s"
-        cursor.execute(query, (email,))
-        confirmation = cursor.fetchone()
-
-        if confirmation:
-            confirmation_id = confirmation['id'],            
-            query = "UPDATE confirmations SET code=%s WHERE id=%s"
-            cursor.execute(query, (code, confirmation_id[0])) 
-
-        else:
-            query = "INSERT INTO confirmations (email, code) VALUES (%s, %s)"
-            cursor.execute(query, (email, code))
-        connection.commit()
-
-        # Enviar o código por e-mail
-        corpo_email = f"""
-        <h3>Código de Confirmação</h3>
-        <p>Seu código de confirmação é: <strong>{code}</strong></p>
-        <p>Use este código para confirmar o seu e-mail.</p>
-        """
-        enviar_email(email, "Código de Confirmação - Navigate Buy", corpo_email)
-        return jsonify({"message": "Código de confirmação enviado para o seu e-mail."}), 200
-    
-    except Error as e:
-        print(f"Erro ao executar consulta: {e}")
-        return jsonify({"message": "Erro ao requisitar nova senha", "Tente novamente": str(e)}), 500
-
-# Rota para confirmar o código
-@app.route('/confirm_code', methods=['POST'])
-def confirm_code():
-    data = request.get_json()
-    email = data.get('email')
-    code = data.get('code')
-
-    if not email or not code:
-        return jsonify({"error": "Dados insuficientes."}), 400
-    
-        
-    connection = get_db_connection()
-    if connection is None:
-        return jsonify({"message": "Erro ao conectar ao banco de dados"}), 500
-
-    cursor = None
-    try:    
-        cursor = connection.cursor(dictionary=True)
-        query = "SELECT email, code FROM confirmations WHERE email=%s AND code=%s"
-        cursor.execute(query, (email, code))
-        confirmation = cursor.fetchone()
-
-        if confirmation:
-            # Remover o código após confirmação bem-sucedida
-            query = "DELETE FROM confirmations WHERE email=%s AND code=%s"
-            cursor.execute(query, (email, code))
-            connection.commit()
-            return jsonify({"message": "Código confirmado com sucesso."}), 200
-        else:
-            return jsonify({"error": "Código de confirmação inválido."}), 400    
-    except Error as e:
-        print(f"Erro ao executar consulta: {e}")
-        return jsonify({"message": "Erro ao requisitar nova senha", "Tente novamente": str(e)}), 500            
-
-if __name__ == '__main__':
-    app.run(port=5000, debug=True)

@@ -4,13 +4,23 @@ import { FaInstagram, FaGithub } from "react-icons/fa6";
 import { GoPaperclip } from "react-icons/go";
 import React from "react";
 
+
 const Footer: React.FC = () => {
+
+  const handleSearchFocus = () => {
+    const navbar = document.querySelector("nav");
+    const searchInput = navbar?.querySelector("input[type='search']") as HTMLInputElement;
+    if (searchInput) {
+      searchInput.focus();
+    }
+  };
+
   return (
     <footer className="bg-black text-white">
       <div className="flex flex-grow justify-center space-x-56 items-center py-12 max-[650px]:space-x-10">
-        <div className="text-lg font-semibold mb-9 max-[650px]:text-sm">
+        <div className="text-lg font-semibold mb-5 max-[650px]:text-sm">
           Conheça mais sobre nós:
-          <div className="flex mt-5 space-x-6 items-center">
+          <div className="flex mt-5 mb-5 space-x-6 items-center">
             <Link href="https://www.instagram.com/navigatebuy/">
               <FaInstagram className="text-4xl max-[650px]:text-xl" />
             </Link>
@@ -24,12 +34,15 @@ const Footer: React.FC = () => {
               <GoPaperclip className="text-4xl max-[650px]:text-xl" />
             </Link>
           </div>
+          <Link href="../pages/termos_de_uso" className="flex hover:text-navigategreen">
+            Acesse nossos termos de uso
+          </Link>
         </div>
         <div className="text-lg max-[650px]:text-sm">
           <p className="block mb-2 font-semibold">
             Destaques
           </p>
-          <Link href="#" className="block mb-2 hover:text-navigategreen">
+          <Link href="#" onClick={handleSearchFocus} className="block mb-2 hover:text-navigategreen">
             Buscar Produto
           </Link>
           <Link href="../pages/avaliacao" className="block mb-2 hover:text-navigategreen">

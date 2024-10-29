@@ -23,7 +23,6 @@ const Home = () => {
   const [showArrows, setShowArrows] = useState(false);
   const [isScrollable, setIsScrollable] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const [categoria, setCategoria] = useState("Acessórios");
 
   const updateScrollState = () => {
     if (scrollContainerRef.current) {
@@ -80,9 +79,9 @@ const Home = () => {
 
   return (
     <>
-      <Navbar onCategorySelect={setCategoria}/>
+      <Navbar />
       <header className='overflow-hidden select-none'>
-        <div className="flex justify-center items-center mx-auto lg:py-44 md:py-20 bg-navigateblue">
+        <div className="flex justify-center items-center mx-auto md:py-16 bg-navigateblue">
           <div className="flex flex-col lg:flex-row justify-center items-center">
             <Animated
               initial={{ opacity: 0, x: 50 }}
@@ -104,7 +103,7 @@ const Home = () => {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}>
-              <img src={'../img/note.png'} alt="Exemplo" className="lg:max-w-xl md:max-w-sm object-cover md:mt-0 mt-10" />
+              <img src={'/img/note.png'} alt="Exemplo" className="lg:max-w-xl md:max-w-sm object-cover md:mt-0 mt-10" />
             </Animated>
           </div>
         </div>
@@ -115,7 +114,7 @@ const Home = () => {
             transition={{ duration: 1 }}>
             <p className={`text-left text-lg md:text-xl lg:text-2xl mb-2 ${poppins.className}`}>Principais lojas e motores de busca online</p>
           </Animated>
-          <div className='relative flex items-center mx-20'>
+          <div className='relative flex items-center'>
             {showArrows && (
               <>
                 <button
@@ -137,13 +136,13 @@ const Home = () => {
             )}
             <div
               ref={scrollContainerRef}
-              className={`flex space-x-8 md:space-x-10 lg:space-x-14 py-4 mx-4 h-32 ${isScrollable ? 'overflow-x-auto' : 'overflow-hidden'}`}
+              className={`flex space-x-8 md:space-x-10 lg:space-x-14 py-4 h-32 ${isScrollable ? 'overflow-x-auto' : 'overflow-hidden'}`}
               style={{ scrollbarWidth: isScrollable ? 'thin' : 'none' }} >
               {cards.map((card) => (
                 <div
                   key={card.id}
                   className='border space-x-4 md:space-x-6 lg:space-x-8 flex border-navigategreen
-                     hover:border-navigateblue hover:shadow-sm hover:shadow-navigateblue min-w-[300px] md:min-w-[240px] lg:min-w-[440px] p-4 bg-white shadow-sm shadow-green-700 rounded-2xl flex-col justify-center'>
+                     hover:border-navigateblue hover:shadow-sm hover:shadow-navigateblue min-w-[200px] lg:min-w-[440px] bg-white shadow-sm shadow-green-700 rounded-2xl flex-col justify-center'>
                   <h3 className={`text-base md:text-lg lg:text-xl font-extrabold ${poppins.className} text-center`}>{card.title}</h3>
                   <a href={card.url} target="_blank" rel="noopener noreferrer">
                     <p className={`text-gray-500 text-sm md:text-base lg:text-xl flex justify-center mr-5 ${poppins.className}`}>Acessar</p>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface CardProps {
   imageSrc: string;
@@ -9,26 +9,39 @@ interface CardProps {
   link: string;
   avaliacoes: string;
   estrelas: string;
+  onSave: () => void;
 }
 
-const Card: React.FC<CardProps> = ({ imageSrc, heartIconSrc, productDescription, brandName, price, link, avaliacoes, estrelas }) => {
+const Card: React.FC<CardProps> = ({ imageSrc, heartIconSrc, productDescription, brandName, price, link, avaliacoes, estrelas, onSave }) => {
+  const [hovered, setHovered] = useState(false);
+
+  const handleMouseEnter = () => {
+    setHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+  };
 
   const redirecionar = () => {
     window.open(link, '_blank');
   };
 
   return (
-    <section className="mx-auto mt-16 mb-5">
-      <div className="w-96 shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl border-2 border-navigateblue bg-white shadow-navigateblue">
+    <section className="mx-auto my-5">
+      <div className="w-full sm:w-60 md:w-80 max-[1300px]:w-80 max-[1600px]:w-96 shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl border-2 border-navigateblue bg-white shadow-navigateblue">
         <div className="relative flex justify-center items-center h-64 overflow-hidden">
           <img
             src={imageSrc}
-            alt="Product"
-            className="w-52 h-fit object-cover"
+            alt="Produto"
+            className="w-56 h-auto object-cover"
           />
           <img
-            src={heartIconSrc}
-            alt="Heart"
+            src={hovered ? "/img/icon-coraçao-pintado.png" : heartIconSrc}
+            alt="Coração"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onClick={onSave}
             className="absolute top-2 right-2 w-6"
           />
         </div>
@@ -49,12 +62,12 @@ const Card: React.FC<CardProps> = ({ imageSrc, heartIconSrc, productDescription,
             <p className="mt-2">{avaliacoes} avaliações do site</p>
             {parseFloat(estrelas) > 0.0 && (
               <>
-                <p className="mt-2 ml-20">{estrelas}</p>
-                <img src="../img/Star.png" className="py-1" alt="Estrela" />
+                <p className="mt-2 ml-6">{estrelas}</p>
+                <img src="/img/Star.png" className="py-1" alt="Estrela" />
               </>
             )}
-          </div>  
-          <button className="inline-flex w-full justify-center gap-x-1 rounded-xl px-7 py-2 text-base font-semibold text-white hover:bg-green-600 bg-navigategreen" onClick={redirecionar}>Acessar</button>
+          </div>
+          <button className="inline-flex aria-label w-full justify-center gap-x-1 rounded-xl px-7 py-2 text-base font-semibold text-white hover:bg-green-600 bg-navigategreen" onClick={redirecionar}>Acessar</button>
         </div>
       </div>
     </section>

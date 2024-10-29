@@ -11,9 +11,8 @@ const favoritos = () => {
     const [username, setUsername] = useState<string>('');
     const [currentUsername, setCurrentUsername] = useState<string>('');
     const [email, setEmail] = useState<string>('');
-    const [categoria, setCategoria] = useState("Acessórios");
     
-    // Efeito para receber dados do perfil
+    {/* Efeito para receber dados do perfil */}
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -48,7 +47,7 @@ const favoritos = () => {
 
     return (
         <main>
-            <Navbar onCategorySelect={setCategoria} />
+            <Navbar />
             <div className="text-center mt-20">
             <ToastContainer />
                 <div className={`font-bold text-3xl max-[1000px]:text-2xl mb-8 ${poppins.className}`}>
@@ -69,4 +68,4 @@ const favoritos = () => {
     )
 }
 
-export default favoritos
+export default favoritos;
