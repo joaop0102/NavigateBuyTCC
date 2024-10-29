@@ -20,7 +20,7 @@ const cards = [
   { id: 8, title: 'Marisa', url: 'https://www.marisa.com.br/' },
   { id: 9, title: 'Kalunga', url: 'https://www.kalunga.com.br/' },
   { id: 10, title: 'Ultrafarma', url: 'https://www.ultrafarma.com.br/' },
-  { id: 11, title: 'Oboticário', url: 'https://www.boticario.com.br/' },
+  { id: 11, title: 'Oboticário', url: 'https://www.boticario.com.br/' },
 ];
 
 const Home = () => {
@@ -42,10 +42,7 @@ const Home = () => {
     const width = window.innerWidth;
     if (width <= 900) {
       setShowArrows(true);
-      setIsScrollable(false); 
-    } else {
-      setShowArrows(true);
-      setIsScrollable(false); 
+      setIsScrollable(false);
     }
     updateScrollState();
   };
@@ -58,8 +55,12 @@ const Home = () => {
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
+      const scrollAmount = window.innerWidth <= 474
+        ? scrollContainerRef.current.offsetWidth / 1
+        : scrollContainerRef.current.offsetWidth / 2;
+
       scrollContainerRef.current.scrollBy({
-        left: -scrollContainerRef.current.offsetWidth / 2,
+        left: -scrollAmount,
         behavior: 'smooth',
       });
     }
@@ -67,21 +68,26 @@ const Home = () => {
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
+      const scrollAmount = window.innerWidth <= 474
+        ? scrollContainerRef.current.offsetWidth / 1
+        : scrollContainerRef.current.offsetWidth / 2;
+
       scrollContainerRef.current.scrollBy({
-        left: scrollContainerRef.current.offsetWidth / 2,
+        left: scrollAmount,
         behavior: 'smooth',
       });
     }
   };
 
   useEffect(() => {
-    if (scrollContainerRef.current) {
-      const scrollContainer = scrollContainerRef.current;
-      const onScroll = () => updateScrollState();
-      scrollContainer.addEventListener('scroll', onScroll);
-      return () => scrollContainer.removeEventListener('scroll', onScroll);
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', updateScrollState);
+      return () => scrollContainer.removeEventListener('scroll', updateScrollState);
     }
-  }, [scrollContainerRef.current]);
+  }, []);
+
+
 
   return (
     <>
@@ -114,7 +120,7 @@ const Home = () => {
                 alt="Exemplo"
                 className="lg:max-w-xl md:max-w-sm object-cover md:mt-0 mt-10 hidden md:block"
               />
-            </Animated> 
+            </Animated>
           </div>
         </div>
         <div className='mt-8 mx-24 bg-white'>
@@ -148,20 +154,24 @@ const Home = () => {
               className={`flex space-x-8 md:space-x-10 lg:space-x-14 py-4 h-32 ${isScrollable ? 'overflow-x-auto' : 'overflow-hidden'}`}
               style={{ scrollbarWidth: isScrollable ? 'thin' : 'none' }} >
               {cards.map((card) => (
-                <div
-                  key={card.id}
-                  className='border space-x-4 md:space-x-6 lg:space-x-8 flex border-navigategreen
-                     hover:border-navigateblue hover:shadow-sm hover:shadow-navigateblue min-w-[200px] lg:min-w-[440px] bg-white shadow-sm shadow-green-700 rounded-2xl flex-col justify-center'>
-                  <h3 className={`text-base md:text-lg lg:text-xl font-extrabold ${poppins.className} text-center`}>{card.title}</h3>
+                <div key={card.id}
+                  className='border space-x-4 md:space-x-6 lg:space-x-8 flex border-navigategreen hover:border-navigateblue hover:shadow-sm hover:shadow-navigateblue 
+                  min-w-[150px] sm:min-w-[200px] lg:min-w-[440px] bg-white shadow-sm shadow-green-700 rounded-2xl flex-col justify-center'>
+                  <h3 className={`text-base md:text-lg lg:text-xl font-extrabold ${poppins.className} text-center`}>
+                    {card.title}
+                  </h3>
                   <a href={card.url} target="_blank" rel="noopener noreferrer">
-                    <p className={`text-gray-500 text-sm md:text-base lg:text-xl flex justify-center mr-5 ${poppins.className}`}>Acessar</p>
+                    <p className={`text-gray-500 text-sm md:text-base lg:text-xl flex justify-center mr-5 ${poppins.className}`}>
+                      Acessar
+                    </p>
                   </a>
                 </div>
+
               ))}
             </div>
           </div>
           <div className='mt-14'>
-            <Animated initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1}}>
+            <Animated initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
               <h2 className={`text-left text-lg md:text-xl lg:text-2xl mb-2 ${poppins.className}`}>Ideias de categorias de pesquisas</h2>
             </Animated>
           </div>
