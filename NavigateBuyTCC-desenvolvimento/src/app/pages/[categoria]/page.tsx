@@ -58,6 +58,7 @@ const Categorias: React.FC = () => {
   const [showFavModal, setShowFavModal] = useState(false);
   const [produtoFavoritado, setProdutoFavoritado] = useState<Produto | null>(null);
   const [produtoId, setProdutoId] = useState("");
+  const [paginasPorParte, setPaginasPorParte] = useState(window.innerWidth < 480 ? 3 : 5);
 
   const limiteProdutos = 12;
 
@@ -85,6 +86,20 @@ const Categorias: React.FC = () => {
       setCategoria(decodeURIComponent(categoriaParam));
     }
   }, [params]);
+
+    {/*   Função para para navegação de 5 itens por vez vai para 3 */ }
+    useEffect(() => {
+      const handleResize = () => {
+        setPaginasPorParte(window.innerWidth < 480 ? 3 : 5);
+      };
+  
+      window.addEventListener('resize', handleResize);
+      handleResize(); // Ajusta ao carregar a primeira vez
+  
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []);
 
   const produtosDaCategoria = produtosJson[categoria] || [];
 
@@ -170,18 +185,19 @@ const Categorias: React.FC = () => {
   {/* Função para rendereizar a paginação */ }
   const renderPagination = () => {
     const itemsPaginacao = [];
-    const comecoPage = Math.floor(page / 5) * 5;
-    const fimPagina = Math.min(comecoPage + 4, totalPaginas - 1);
+    const comecoPage = Math.floor(page / paginasPorParte) * paginasPorParte;
+    const fimPagina = Math.min(comecoPage + paginasPorParte - 1, totalPaginas - 1);
 
     if (comecoPage > 0) {
       itemsPaginacao.push(
         <div key="prev-ellipsis" className="flex items-center">
           <span
             className="bloco-nav cursor-pointer ml-2"
-            onClick={() => handlePageChange(comecoPage - 1)}>
+            onClick={() => handlePageChange(comecoPage - 1)}
+          >
             ...
           </span>
-          <span className="h-12 w-[2px] bg-navigateblue ml-2  hidden md:block"></span>
+          <span className="h-12 w-[2px] bg-navigateblue ml-2 hidden md:block"></span>
         </div>
       );
     }
@@ -199,7 +215,8 @@ const Categorias: React.FC = () => {
           <div className={`bloco-nav ${page === index ? 'bloco-nav-selecionado' : ''}`}>
             {index + 1}
           </div>
-          {index < fimPagina && (<span className="linha-divisoria h-12 w-[2px] bg-navigateblue"></span>
+          {index < fimPagina && (
+            <span className="linha-divisoria h-12 w-[2px] bg-navigateblue"></span>
           )}
         </label>
       );
@@ -208,16 +225,18 @@ const Categorias: React.FC = () => {
     if (fimPagina < totalPaginas - 1) {
       itemsPaginacao.push(
         <div key="next-ellipsis" className="flex items-center">
-          <span className="h-12 w-[2px] bg-navigateblue mr-2 hidden md:block"></span>
-          <span className="bloco-nav cursor-pointer mr-2"
-            onClick={() => handlePageChange(fimPagina + 1)}>
+          <span className="linha-divisoria h-12 w-[2px] bg-navigateblue mr-2 hidden md:block"></span>
+          <span
+            className="bloco-nav cursor-pointer mr-2"
+            onClick={() => handlePageChange(fimPagina + 1)}
+          >
             ...
           </span>
         </div>
       );
     }
 
-    return itemsPaginacao;
+    return <div className="flex">{itemsPaginacao}</div>;
   };
 
   {/* Função para calcular os preços mais caros e mais baratos */ }
@@ -481,7 +500,7 @@ const Categorias: React.FC = () => {
       {/* Tabela */}
       <div className="px-4 sm:px-16 md:px-28 p-5 min-w-[200px]">
         <h2 className="text-center text-2xl font-bold mt-10 mb-4">
-          Preços do produto
+          Preços dos produtos 
         </h2>
         <canvas ref={chartRef} className={`rounded-xl ${isChartVisible ? "bg-gray-300" : ""}`}></canvas>
       </div>

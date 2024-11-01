@@ -140,11 +140,7 @@
     .seta-nav, .seta-nav-esq {
         margin: 8px; 
     }
-
-    .flex {
-        flex-direction: column; 
-    }
-
+    
     .seta-nav,
     .seta-nav-esq {
         font-size: 1.5rem; 

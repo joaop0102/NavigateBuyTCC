@@ -29,9 +29,6 @@ const sites = [
 
 ];
 
-
-
-
 const Conversoes = () => {
     const [amount, setAmount] = useState<number>(0);
     const [fromCurrency, setFromCurrency] = useState<string>("USD");
@@ -109,7 +106,6 @@ const Conversoes = () => {
         });
     };
 
-
     return (
         <main>
             <Navbar />
@@ -126,7 +122,6 @@ const Conversoes = () => {
                         <div className="text-xl">
                             <p>Selecione a moeda do produto pela qual deseja converter:</p>
                         </div>
-
                         <Menu as="div" className="relative inline-block text-left">
                             <MenuButton className="inline-flex justify-center rounded-3xl px-8 py-4 text-lg cursor-default bg-navigateblue text-white max-[450px]:px-3">
                                 <p>
@@ -149,7 +144,6 @@ const Conversoes = () => {
                                 </p>
                                 <MdArrowDropDown aria-hidden="true" className="h-5 w-5 mt-1 ml-1 text-white" />
                             </MenuButton>
-
                             <MenuItems className="absolute mt-2 w-48 origin-top-left bg-white divide-y divide-gray-400 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
                                 {["USD", "EUR", "GBP", "JPY", "CHF"].map((currency) => (
                                     <MenuItem key={currency}>
@@ -190,15 +184,12 @@ const Conversoes = () => {
                             </MenuButton>
                         </Menu>
                     </div>
-
-
                     <button
                         onClick={handleConversion}
                         className="inline-flex justify-center mt-10 mb-12 rounded-2xl bg-navigategreen px-10 py-3 text-xl font-semibold text-white hover:bg-green-600"
                     >
                         Converter
                     </button>
-
                     {result !== null && (
                         <div className="flex flex-col items-center mb-10">
                             <p className="text-2xl">
@@ -226,7 +217,6 @@ const Conversoes = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1 }} >
-
                     <div className="mt-20">
                         <p className={`font-bold text-3xl max-[1000px]:text-2xl mb-8 ${poppins.className}`}>
                             Quer saber mais sobre
@@ -235,7 +225,6 @@ const Conversoes = () => {
                             e como são calculadas?
                         </p>
                     </div>
-
                     <a
                         href="https://www.gov.br/receitafederal/pt-br/assuntos/aduana-e-comercio-exterior/manuais/remessas-postal-e-expressa/preciso-pagar-impostos-nas-compras-internacionais/quanto-pagarei-de-imposto#:~:text=A%20base%20de%20c%C3%A1lculo%20do,valor%20do%20seguro%20do%20transporte."
                         target="_blank" rel="noopener noreferrer">
@@ -243,7 +232,6 @@ const Conversoes = () => {
                             className="inline-flex justify-center mt-4 mb-4 rounded-3xl bg-navigategreen px-6 py-2 text-xl font-semibold text-white hover:bg-green-600"
                         >Acessar</button>
                     </a>
-
                     <div className="flex justify-center">
                         <img
                             src="/img/globo.png"
@@ -252,7 +240,6 @@ const Conversoes = () => {
                         />
                     </div>
                 </Animated>
-
                 <div className='relative flex items-center mx-20'>
                     <Animated
                         initial={{ opacity: 0, y: 50 }}
@@ -263,12 +250,12 @@ const Conversoes = () => {
                         </h2>
                     </Animated>
                 </div>
-
                 <div className="flex items-center justify-center space-x-4 px-4 md:px-16 py-4 xl:py-8 mb-10">
                     <MdArrowBackIosNew
                         className="text-3xl md:text-4xl cursor-pointer"
                         onClick={handlePrev}
-                        style={{ visibility: currentIndex === 0 ? 'hidden' : 'visible' }} />
+                        style={{ visibility: currentIndex === 0 ? 'hidden' : 'visible' }}
+                    />
                     <div className="flex-grow flex justify-center max-w-full">
                         <div className={`grid grid-cols-1 gap-x-16 ${windowWidth >= 800 && windowWidth < 1024 ? 'md:grid-cols-2' : windowWidth >= 1024 ? 'lg:grid-cols-3' : ''}`}>
                             {sites
@@ -276,8 +263,8 @@ const Conversoes = () => {
                                 .map((site) => (
                                     <div
                                         key={site.id}
-                                        className={`rounded-2xl border shadow-lg text-2xl p-4 mt-10 md:p-8 mb-6 border-navigategreen shadow-navigategreen
-                                         bg-white w-full ${windowWidth <= 350 ? 'max-w-xs' : 'max-w-sm'}`} >
+                                        className={`rounded-2xl border shadow-lg text-2xl p-4 mt-10 md:p-8 mb-6 border-navigategreen shadow-navigategreen bg-white w-full ${windowWidth <= 350 ? 'max-w-xs' : 'max-w-sm'}`}
+                                    >
                                         <p className="text-center font-bold mb-6">{site.title}</p>
                                         <div className="text-center mb-8">
                                             <p className="text-lg">{site.desc}</p>
@@ -300,7 +287,8 @@ const Conversoes = () => {
                     <MdArrowForwardIos
                         className={`text-3xl md:text-4xl cursor-pointer ${windowWidth > 1400 ? 'ml-2' : 'ml-4'}`}
                         onClick={handleNext}
-                        style={{ visibility: currentIndex + cardsPerPage >= sites.length ? 'hidden' : 'visible' }} />
+                        style={{ visibility: currentIndex + cardsPerPage >= sites.length ? 'hidden' : 'visible' }}
+                    />
                 </div>
             </div>
             <Footer />

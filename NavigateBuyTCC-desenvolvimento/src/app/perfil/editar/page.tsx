@@ -32,11 +32,26 @@ const Editar = () => {
         setUsername(data.username || "");
         setCurrentUsername(data.username || "");
         setEmail(data.email || "");
-      } catch (error) {
-        toast.error('Usuário não autenticado, faça Login', {position: "top-center", hideProgressBar: true, theme: "dark"});
-        setTimeout(() => {
-          window.location.href = '../cadastro_login/login';
-        }, 3000);
+      } catch (error: any) {
+        if (error.message === "Failed to fetch" || error.message.includes("NetworkError")) {
+          toast.error('Erro de conexão: O servidor está offline. Tente novamente mais tarde.', {
+            position: "top-center",
+            hideProgressBar: true,
+            theme: "dark"
+          });
+          setTimeout(() => {
+            window.location.href = '../';
+          }, 2500);
+        } else {
+          toast.error('Usuário não autenticado, faça Login', {
+            position: "top-center",
+            hideProgressBar: true,
+            theme: "dark"
+          });
+          setTimeout(() => {
+            window.location.href = '../cadastro_login/login';
+          }, 3000);
+        }
       }
     };
 
@@ -95,7 +110,7 @@ const Editar = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <header className="flex-grow">
-        <ToastContainer />
+        <ToastContainer limit={1} />
         <h2 className={`text-center font-extrabold mt-20 text-4xl ${poppins.className}`}>
           Perfil
         </h2>

@@ -13,6 +13,8 @@ import { Menu } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import Modal from '@/components/ModalFavorito';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 {/* Listas Json de produtos */ }
 import acessoriosData from '@/../api/listasJson/Acessorios.json';
@@ -54,6 +56,7 @@ const Pesquisa: React.FC = () => {
   const [showFavModal, setShowFavModal] = useState(false);
   const [produtoId, setProdutoId] = useState("");
   const [sugestoes, setSugestoes] = useState<Produto[]>([]);
+  const [paginasPorParte, setPaginasPorParte] = useState(window.innerWidth < 480 ? 3 : 5);
 
   const limiteProdutos = 12;
 
@@ -167,15 +170,16 @@ const Pesquisa: React.FC = () => {
   {/* Função para rendereizar a paginação */ }
   const renderPagination = () => {
     const itemsPaginacao = [];
-    const comecoPage = Math.floor(page / 5) * 5;
-    const fimPagina = Math.min(comecoPage + 4, totalPaginas - 1);
+    const comecoPage = Math.floor(page / paginasPorParte) * paginasPorParte;
+    const fimPagina = Math.min(comecoPage + paginasPorParte - 1, totalPaginas - 1);
 
     if (comecoPage > 0) {
       itemsPaginacao.push(
         <div key="prev-ellipsis" className="flex items-center">
           <span
             className="bloco-nav cursor-pointer ml-2"
-            onClick={() => handlePageChange(comecoPage - 1)}>
+            onClick={() => handlePageChange(comecoPage - 1)}
+          >
             ...
           </span>
           <span className="h-12 w-[2px] bg-navigateblue ml-2 hidden md:block"></span>
@@ -196,7 +200,8 @@ const Pesquisa: React.FC = () => {
           <div className={`bloco-nav ${page === index ? 'bloco-nav-selecionado' : ''}`}>
             {index + 1}
           </div>
-          {index < fimPagina && (<span className="linha-divisoria h-12 w-[2px] bg-navigateblue"></span>
+          {index < fimPagina && (
+            <span className="linha-divisoria h-12 w-[2px] bg-navigateblue"></span>
           )}
         </label>
       );
@@ -205,17 +210,20 @@ const Pesquisa: React.FC = () => {
     if (fimPagina < totalPaginas - 1) {
       itemsPaginacao.push(
         <div key="next-ellipsis" className="flex items-center">
-          <span className="h-12 w-[2px] bg-navigateblue mr-2 hidden md:block"></span>
-          <span className="bloco-nav cursor-pointer mr-2"
-            onClick={() => handlePageChange(fimPagina + 1)}>
+          <span className="linha-divisoria h-12 w-[2px] bg-navigateblue mr-2 hidden md:block"></span>
+          <span
+            className="bloco-nav cursor-pointer mr-2"
+            onClick={() => handlePageChange(fimPagina + 1)}
+          >
             ...
           </span>
         </div>
       );
     }
 
-    return itemsPaginacao;
+    return <div className="flex">{itemsPaginacao}</div>;
   };
+  
 
   {/* Função para calcular os preços mais caros e mais baratos */ }
   const calcularPrecos = (produtos: Produto[]) => {
@@ -381,6 +389,20 @@ const Pesquisa: React.FC = () => {
     }
   };
 
+  {/*   Função para para navegação de 5 itens por vez vai para 3 */ }
+  useEffect(() => {
+    const handleResize = () => {
+      setPaginasPorParte(window.innerWidth < 480 ? 3 : 5);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Ajusta ao carregar a primeira vez
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   {/* Função para fechar modal favorito */ }
   const handleModalFechar = (opt: boolean) => {
     setShowFavModal(false);
@@ -393,9 +415,7 @@ const Pesquisa: React.FC = () => {
 
   return (
     <main>
-      <div>
-        <Navbar />
-      </div>
+          <Navbar />
       {/* Título */}
       <div className="flex justify-center mt-20">
         <ToastContainer />
@@ -510,22 +530,23 @@ const Pesquisa: React.FC = () => {
       }
       {/* Navegação */}
       <div className="flex flex-col items-center mt-10">
-        <div className="flex justify-center items-center">
-          {page > 0 && (
-            <a onClick={() => handlePageChange(page - 1)} className="text-white seta-nav mr-2">
-              <MdKeyboardArrowLeft size={35} />
-            </a>
-          )}
-          <div className="flex items-center barra-nav">
-            {renderPagination()}
-          </div>
-          {page < totalPaginas - 1 && (
-            <a onClick={() => handlePageChange(page + 1)}>
-              <MdKeyboardArrowRight size={20} className="seta-nav-esq ml-2" />
-            </a>
-          )}
+      <div className="flex justify-center items-center">
+        {page > 0 && (
+          <a onClick={() => handlePageChange(page - 1)} className="text-white seta-nav mr-2 cursor-pointer">
+            <MdKeyboardArrowLeft size={35} />
+          </a>
+        )}
+        <div className="flex items-center barra-nav">
+          {renderPagination()}
         </div>
+        {page < totalPaginas - 1 && (
+          <a onClick={() => handlePageChange(page + 1)} className="cursor-pointer">
+            <MdKeyboardArrowRight size={20} className="seta-nav-esq ml-2" />
+          </a>
+        )}
       </div>
+    </div>
+
       {/* Tabela */}
       <div className="px-4 sm:px-16 md:px-28 p-5 min-w-[200px]">
         <h2 className="text-center text-2xl font-bold mt-10 mb-4">
