@@ -73,7 +73,6 @@
     z-index: 1; 
 }
 
-
 /* Responsividade */
 @media (max-width: 690px) {
     .seta-nav, .seta-nav-esq {

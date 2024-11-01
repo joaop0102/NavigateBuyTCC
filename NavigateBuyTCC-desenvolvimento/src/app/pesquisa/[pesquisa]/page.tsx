@@ -178,7 +178,7 @@ const Pesquisa: React.FC = () => {
             onClick={() => handlePageChange(comecoPage - 1)}>
             ...
           </span>
-          <span className="h-12 w-[2px] bg-navigateblue ml-2  hidden md:block"></span>
+          <span className="h-12 w-[2px] bg-navigateblue ml-2 hidden md:block"></span>
         </div>
       );
     }
@@ -335,7 +335,6 @@ const Pesquisa: React.FC = () => {
         chart.destroy();
       };
     }
-
   }, [searchTerm]);
 
   {/* Função para favoritar produtos */ }
@@ -367,30 +366,47 @@ const Pesquisa: React.FC = () => {
       setProdutoId(data.id);
       setShowFavModal(true);
       toast.success('Produto favoritado!', { position: "top-center", autoClose: 5000, closeOnClick: true, pauseOnHover: true, theme: "dark" });
-    } catch (error: unknown) {
-      const errorMessage = (error as Error).message;
-      toast.error(errorMessage, { position: "bottom-left", autoClose: 5000, closeOnClick: true, pauseOnHover: true, theme: "dark" });
+    } catch (error: any) {
+      if (error.message === "Faile to fetch" || error.error.message.includes("NetworkError")) {
+        toast.error('Você precisa estar logado para favoritar!', { position: "bottom-left", autoClose: 5000, closeOnClick: true, pauseOnHover: true, theme: "dark" });
+        setTimeout(() => {
+          window.location.href = '../';
+        }, 2500);
+      } else {
+        toast.error('Você precisa estar logado para favoritar!', { position: "bottom-left", autoClose: 5000, closeOnClick: true, pauseOnHover: true, theme: "dark" });
+        setTimeout(() => {
+          window.location.href = '../';
+        }, 2500);
+      }
     }
   };
 
-  const handleModalClose = (opt: boolean) => {
+  {/* Função para fechar modal favorito */ }
+  const handleModalFechar = (opt: boolean) => {
     setShowFavModal(false);
   };
 
+  {/* Efeito para retornar a primeira página após uma nova busca */ }
+  useEffect(() => {
+    setPage(0);
+  }, [searchTerm]);
+
   return (
     <main>
-      <Navbar />
+      <div>
+        <Navbar />
+      </div>
       {/* Título */}
       <div className="flex justify-center mt-20">
         <ToastContainer />
         {showFavModal && (
           <Modal
-            onConfirm={() => handleModalClose(true)}
-            onClose={() => handleModalClose(false)}
+            onConfirm={() => handleModalFechar(true)}
+            onClose={() => handleModalFechar(false)}
             produtoId={produtoId}
           />
         )}
-        <h2 className="text-2xl text-black">
+        <h2 className="text-2xl text-black text-center">
           A pesquisa feita foi <span className="font-bold">“{searchTerm}”</span>
         </h2>
       </div>
@@ -401,7 +417,7 @@ const Pesquisa: React.FC = () => {
         {/* Menu de filtros */}
         <Menu as="div" className="relative inline-block text-left max-[650px]:mt-5">
           <div>
-            <Menu.Button className="inline-flex rounded-full px-9 py-4 text-lg bg-navigateblue text-white hover:bg-blue-800">
+            <Menu.Button className="inline-flex rounded-full px-9 py-4 text-lg bg-navigateblue text-white hover:bg-white hover:text-navigateblue">
               {textoFiltro}
               <ChevronDownIcon aria-hidden="true" className="ml-2 w-7 text-white" />
             </Menu.Button>
@@ -511,7 +527,7 @@ const Pesquisa: React.FC = () => {
         </div>
       </div>
       {/* Tabela */}
-      <div className="px-40 p-5">
+      <div className="px-4 sm:px-16 md:px-28 p-5 min-w-[200px]">
         <h2 className="text-center text-2xl font-bold mt-10 mb-4">
           Preços de produtos em "{searchTerm}"
         </h2>
