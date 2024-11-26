@@ -9,10 +9,12 @@ import { enableInput } from "@/utils/habilitarInput";
 import { poppins } from "@/app/fonts";
 
 const Editar = () => {
-  const [username, setUsername] = useState<string>('');
-  const [currentUsername, setCurrentUsername] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>('');
+  const [usuario, setUsuario] = useState<string>('');
+  const [currentUsuario, setCurrentUsuario] = useState<string>('');
+  const [email_consumidor, setEmail] = useState<string>('');
+  const [senha_consumidor, setSenha] = useState<string>('');
 
   // Efeito para receber dados do perfil
   useEffect(() => {
@@ -29,9 +31,10 @@ const Editar = () => {
         }
 
         const data = await response.json();
-        setUsername(data.username || "");
-        setCurrentUsername(data.username || "");
-        setEmail(data.email || "");
+        setAvatarUrl(data.avatar);
+        setUsuario(data.usuario || "");
+        setCurrentUsuario(data.usuario || "");
+        setEmail(data.email_consumidor || "");
       } catch (error: any) {
         if (error.message === "Failed to fetch" || error.message.includes("NetworkError")) {
           toast.error('Erro de conexão: O servidor está offline. Tente novamente mais tarde.', {
@@ -60,16 +63,51 @@ const Editar = () => {
 
   // Função para editar perfil
   const habilitarEditarPerfil = async () => {
-    const profileUpdateData = { username, email, password };
+    const allowedExtensions = ["png", "jpg", "jpeg", "gif", "ico"];
+    const maxFileSize = 5 * 1024 * 1024; // 5 MB
+
+    if (avatarFile) {
+      const fileExtension = avatarFile.name.split(".").pop()?.toLowerCase();
+      const fileSize = avatarFile.size;
+
+      if (!allowedExtensions.includes(fileExtension || "")) {
+        toast.error("Tipo de arquivo não permitido. Envie apenas imagens (png, jpg, jpeg, gif, ico).", {
+          position: "bottom-left",
+          autoClose: 5000,
+          closeOnClick: true,
+          pauseOnHover: true,
+          theme: "dark",
+        });
+        return;
+      }
+
+      if (fileSize > maxFileSize) {
+        toast.error("O tamanho do arquivo excede o limite de 5 MB.", {
+          position: "bottom-left",
+          autoClose: 5000,
+          closeOnClick: true,
+          pauseOnHover: true,
+          theme: "dark",
+        });
+        return;
+      }
+    }
+    const profileUpdateData = new FormData();
+    profileUpdateData.append('usuario', usuario);
+    profileUpdateData.append('email_consumidor', email_consumidor);
+    profileUpdateData.append('senha_consumidor', senha_consumidor);
+    if (avatarFile) {
+      profileUpdateData.append('avatar', avatarFile);
+    }
+
+    console.log("Avatar File:", avatarFile);
+    console.log("Dados do perfil:", Array.from(profileUpdateData.entries()));
 
     try {
       const response = await fetch("http://localhost:5000/app/editar-perfil", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
         credentials: "include",
-        body: JSON.stringify(profileUpdateData),
+        body: profileUpdateData,
       });
 
       if (!response.ok) {
@@ -77,10 +115,10 @@ const Editar = () => {
         throw new Error(errorData.error || "Erro ao atualizar perfil");
       }
 
-      const data = await response.json();
-      toast.success("Perfil atualizado com sucesso!", { position: "bottom-left", autoClose: 5000, closeOnClick: true, pauseOnHover: true, theme: "dark" });
-    } catch (error) {
-      toast.error('Erro ao atualizar perfil', { position: "bottom-left", autoClose: 5000, closeOnClick: true, pauseOnHover: true, theme: "dark" });
+      toast.success("Perfil atualizado com sucesso!", { position: "bottom-left", autoClose: 1500, closeOnClick: true, theme: "dark" });
+      setAvatarFile(null);
+    } catch (error: any) {
+      toast.error('Erro ao atualizar o perfil', { position: "bottom-left", autoClose: 3000, closeOnClick: true, theme: "dark" });
     }
   };
 
@@ -115,9 +153,9 @@ const Editar = () => {
           Perfil
         </h2>
         <p className={`text-center mt-5 text-3xl ${poppins.className}`}>
-          Olá {currentUsername}
+          Olá {currentUsuario}
         </p>
-        <Avatar />
+        <Avatar initialAvatarUrl={avatarUrl} onAvatarChange={setAvatarFile} />
         <div className="relative mb-8 space-y-10 max-w-2xl mx-auto px-4">
           <div className="relative flex flex-col mb-6">
             <label htmlFor="nome-completo" className={`mb-2 text-left text-xl ${poppins.className}`}>
@@ -126,8 +164,8 @@ const Editar = () => {
             <input
               id="nome-completo"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={usuario}
+              onChange={(e) => setUsuario(e.target.value)}
               className="py-3 px-5 pr-12 sm:px-8 md:px-10 text-xl sm:text-lg md:text-xl rounded-2xl w-full border
               border-navigateblue shadow-md shadow-navigateblue"
               disabled
@@ -146,9 +184,9 @@ const Editar = () => {
               E-mail:
             </label>
             <input
-              id="email"
+              id="email_consumidor"
               type="email"
-              value={email}
+              value={email_consumidor}
               onChange={(e) => setEmail(e.target.value)}
               className="py-3 px-5 pr-12 sm:px-8 md:px-10 text-xl sm:text-lg md:text-xl rounded-2xl w-full border
                  border-navigateblue shadow-md shadow-navigateblue"
@@ -163,9 +201,9 @@ const Editar = () => {
             <input
               id="senha"
               type="password"
-              value={password}
+              value={senha_consumidor}
               placeholder="Se não quiser alterar a senha, deixe em branco"
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setSenha(e.target.value)}
               className="py-3 px-5 pr-12 sm:px-8 md:px-10 text-xl sm:text-lg md:text-xl rounded-2xl w-full border
                 border-navigateblue shadow-md shadow-navigateblue placeholder-gray-600"
               disabled

@@ -19,7 +19,7 @@ class ObtSpider(scrapy.Spider):
         'https://www.boticario.com.br/busca/?q=Protetor%20solar%20facial%20',
         'https://www.boticario.com.br/busca/?q=Blush',
         'https://www.boticario.com.br/busca/?q=primer',
-                  ]
+        ]
 
     def parse(self, response):
         seen_products = set() 

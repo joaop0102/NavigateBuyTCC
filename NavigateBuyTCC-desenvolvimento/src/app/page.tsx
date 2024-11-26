@@ -1,7 +1,7 @@
 "use client";
-
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { poppins } from "./fonts";
+import Image from 'next/image';
 import "../app/globals.css";
 import Animated from '../utils/animacoes';
 import Cards from '../components/homecard';
@@ -26,7 +26,7 @@ const cards = [
 const Home = () => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [showArrows, setShowArrows] = useState(true);
+  const [showArrows, setShowArrows] = useState(false);
   const [isScrollable, setIsScrollable] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -38,29 +38,28 @@ const Home = () => {
     }
   };
 
-  const handleResize = () => {
+  const handleResize = useCallback(() => {
     const width = window.innerWidth;
     if (width <= 900) {
+      setShowArrows(false);
+      setIsScrollable(true);
+    } else {
       setShowArrows(true);
       setIsScrollable(false);
     }
     updateScrollState();
-  };
+  }, []);
 
   useEffect(() => {
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [handleResize]);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      const scrollAmount = window.innerWidth <= 474
-        ? scrollContainerRef.current.offsetWidth / 1
-        : scrollContainerRef.current.offsetWidth / 2;
-
       scrollContainerRef.current.scrollBy({
-        left: -scrollAmount,
+        left: -scrollContainerRef.current.offsetWidth / 2,
         behavior: 'smooth',
       });
     }
@@ -68,26 +67,21 @@ const Home = () => {
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      const scrollAmount = window.innerWidth <= 474
-        ? scrollContainerRef.current.offsetWidth / 1
-        : scrollContainerRef.current.offsetWidth / 2;
-
       scrollContainerRef.current.scrollBy({
-        left: scrollAmount,
+        left: scrollContainerRef.current.offsetWidth / 2,
         behavior: 'smooth',
       });
     }
   };
 
   useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', updateScrollState);
-      return () => scrollContainer.removeEventListener('scroll', updateScrollState);
+    if (scrollContainerRef.current) {
+      const scrollContainer = scrollContainerRef.current;
+      const onScroll = () => updateScrollState();
+      scrollContainer.addEventListener('scroll', onScroll);
+      return () => scrollContainer.removeEventListener('scroll', onScroll);
     }
-  }, []);
-
-
+  }, [scrollContainerRef.current]);
 
   return (
     <>
@@ -115,10 +109,13 @@ const Home = () => {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}>
-              <img
-                src={'/img/note.png'}
+              <Image
+                src="/img/note.png"
                 alt="Exemplo"
                 className="lg:max-w-xl md:max-w-sm object-cover md:mt-0 mt-10 hidden md:block"
+                width={800}
+                height={300}
+                priority
               />
             </Animated>
           </div>
@@ -154,19 +151,15 @@ const Home = () => {
               className={`flex space-x-8 md:space-x-10 lg:space-x-14 py-4 h-32 ${isScrollable ? 'overflow-x-auto' : 'overflow-hidden'}`}
               style={{ scrollbarWidth: isScrollable ? 'thin' : 'none' }} >
               {cards.map((card) => (
-                <div key={card.id}
-                  className='border space-x-4 md:space-x-6 lg:space-x-8 flex border-navigategreen hover:border-navigateblue hover:shadow-sm hover:shadow-navigateblue 
-                  min-w-[150px] sm:min-w-[200px] lg:min-w-[440px] bg-white shadow-sm shadow-green-700 rounded-2xl flex-col justify-center'>
-                  <h3 className={`text-base md:text-lg lg:text-xl font-extrabold ${poppins.className} text-center`}>
-                    {card.title}
-                  </h3>
+                <div
+                  key={card.id}
+                  className='border space-x-4 md:space-x-6 lg:space-x-8 flex border-navigategreen
+                     hover:border-navigateblue hover:shadow-sm hover:shadow-navigateblue min-w-[200px] lg:min-w-[440px] bg-white shadow-sm shadow-green-700 rounded-2xl flex-col justify-center'>
+                  <h3 className={`text-base md:text-lg lg:text-xl font-extrabold ${poppins.className} text-center`}>{card.title}</h3>
                   <a href={card.url} target="_blank" rel="noopener noreferrer">
-                    <p className={`text-gray-500 text-sm md:text-base lg:text-xl flex justify-center mr-5 ${poppins.className}`}>
-                      Acessar
-                    </p>
+                    <p className={`text-gray-500 text-sm md:text-base lg:text-xl flex justify-center mr-5 ${poppins.className}`}>Acessar</p>
                   </a>
                 </div>
-
               ))}
             </div>
           </div>

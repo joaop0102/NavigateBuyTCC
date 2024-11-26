@@ -6,7 +6,7 @@ import { AiOutlineSearch, AiOutlineMenu, AiOutlineUser, AiOutlineClose } from "r
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { BiTransfer } from "react-icons/bi";
 import LogoAnimation from "../utils/logoAnimacao";
-import Categorias from "./categorias";
+import Categorias from "@/components/categorias";
 
 interface Produto {
   título: string;
@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
   return (
     <nav>
       <div className="bg-white">
-        <div className="flex items-center h-16 px-4 sm:px-6 lg:px-8 select-none">
+        <div className="flex flex-grow items-center h-16 px-8 select-none">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <LogoAnimation
@@ -122,6 +122,7 @@ const Navbar: React.FC = () => {
           <form onSubmit={handleSearchSubmit} className="relative flex flex-1 max-w-lg mx-auto max-lg:hidden">
             <div className="flex flex-1 md:pr-16 pr-10 rounded-full text-white bg-navigategreen">
               <input
+                name="buscar-produto"
                 type="search"
                 placeholder="Buscar produto"
                 ref={searchInputRef}
@@ -157,7 +158,7 @@ const Navbar: React.FC = () => {
                   <MdKeyboardArrowDown className="text-xl" />
                 </Link>
                 {showComponent && (<Categorias onCategorySelect={handleCategoryChange} />)}
-                <Link href="/pages/avaliacao" className="rounded-lg p-2 transition-all duration-500 text-white hover:bg-white hover:text-black">
+                <Link href="/pages/buscarAvaliacoes" className="rounded-lg p-2 transition-all duration-500 text-white hover:bg-white hover:text-black">
                   <span className="hidden xl:inline">Buscar comentários de avaliação</span>
                   <span className="inline xl:hidden">Avaliações</span>
                 </Link>
@@ -173,7 +174,7 @@ const Navbar: React.FC = () => {
                   <Link href="/cadastro_login/login" className="px-4 py-4 hover:bg-white hover:text-black text-white rounded-md transition-all duration-500">
                     Login
                   </Link>
-                  <Link href="/cadastro_login/cadastro" className="px-4 py-4 hover:bg-white hover:text-black text-white rounded-md transition-all duration-500">
+                  <Link href="/cadastro_login/cadastrarConsumidor" className="px-4 py-4 hover:bg-white hover:text-black text-white rounded-md transition-all duration-500">
                     Cadastrar
                   </Link>
                   <Link href="/perfil/editar" className="p-2 hover:bg-white hover:text-black text-white">
@@ -191,8 +192,9 @@ const Navbar: React.FC = () => {
                 )}
               </button>
               <form onSubmit={handleSearchSubmit} className="relative flex flex-1 max-w-xs mx-auto">
-                <div className="flex flex-1 pr-16 rounded-full text-white bg-navigategreen">
+                <div className="pr-16 rounded-full text-white bg-navigategreen">
                   <input
+                    name="buscar-produto"
                     type="search"
                     placeholder="Buscar produto"
                     ref={searchInputRef}
@@ -216,7 +218,7 @@ const Navbar: React.FC = () => {
                 <MdKeyboardArrowDown className="text-xl ml-1" />
               </Link>
               {showComponent && (<Categorias onCategorySelect={handleCategoryChange} />)}
-              <Link href="/pages/avaliacao" className="rounded-lg p-2 block text-white hover:bg-white hover:text-black">
+              <Link href="/pages/buscarAvaliacoes" className="rounded-lg p-2 block text-white hover:bg-white hover:text-black">
                 Buscar comentários de avaliação
               </Link>
               <Link href="/pages/conversoes" className="rounded-lg p-2 block text-white hover:bg-white hover:text-black">
@@ -228,7 +230,7 @@ const Navbar: React.FC = () => {
               <Link href="/cadastro_login/login" className="rounded-lg p-2 block text-white hover:bg-white hover:text-black">
                 Login
               </Link>
-              <Link href="/cadastro_login/cadastro" className="rounded-lg p-2 block text-white hover:bg-white hover:text-black">
+              <Link href="/cadastro_login/cadastrarConsumidor" className="rounded-lg p-2 block text-white hover:bg-white hover:text-black">
                 Cadastrar-se
               </Link>
               <Link href="/perfil/editar" className="rounded-lg p-2 block text-white hover:bg-white hover:text-black">

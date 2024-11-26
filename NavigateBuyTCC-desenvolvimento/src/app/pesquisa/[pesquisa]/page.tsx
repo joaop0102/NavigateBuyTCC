@@ -13,8 +13,6 @@ import { Menu } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import Modal from '@/components/ModalFavorito';
-import 'react-toastify/dist/ReactToastify.css';
-
 
 {/* Listas Json de produtos */ }
 import acessoriosData from '@/../api/listasJson/Acessorios.json';
@@ -56,7 +54,7 @@ const Pesquisa: React.FC = () => {
   const [showFavModal, setShowFavModal] = useState(false);
   const [produtoId, setProdutoId] = useState("");
   const [sugestoes, setSugestoes] = useState<Produto[]>([]);
-  const [paginasPorParte, setPaginasPorParte] = useState(window.innerWidth < 480 ? 3 : 5);
+  const [paginasPorParte, setPaginasPorParte] = useState<number>(() => typeof window !== "undefined" && window.innerWidth < 480 ? 3 : 5);
 
   const limiteProdutos = 12;
 
@@ -223,7 +221,6 @@ const Pesquisa: React.FC = () => {
 
     return <div className="flex">{itemsPaginacao}</div>;
   };
-  
 
   {/* Função para calcular os preços mais caros e mais baratos */ }
   const calcularPrecos = (produtos: Produto[]) => {
@@ -272,7 +269,8 @@ const Pesquisa: React.FC = () => {
     const { menorPreco, maiorPreco, mediaPreco } = calcularPrecos(produtosPesquisados);
 
     if (chartRef.current) {
-      setIsChartVisible(true); const chart = new Chart(chartRef.current!, {
+      setIsChartVisible(true);
+      const chart = new Chart(chartRef.current, {
         type: 'line',
         data: {
           labels: ['Mais Barato', 'Média', 'Mais Caro'],
@@ -281,8 +279,11 @@ const Pesquisa: React.FC = () => {
               label: `Preços em "${searchTerm}" R$`,
               data: [menorPreco, mediaPreco, maiorPreco],
               borderColor: '#000000',
-              backgroundColor: '#007f00',
+              backgroundColor: '#0C8249',
               borderWidth: 2,
+              pointBackgroundColor: ['green', '#0C0440', 'green'],
+              pointBorderColor: '#000000',
+              pointRadius: 5,
             },
           ],
         },
@@ -302,41 +303,37 @@ const Pesquisa: React.FC = () => {
               beginAtZero: false,
               grid: {
                 color: 'black',
-              }
+              },
             },
             x: {
               beginAtZero: false,
               grid: {
-                tickColor: 'blue',
+                tickColor: 'green',
                 color: 'black',
               },
               ticks: {
-                color: 'green',
-              }
-            }
+                color: (context) => {
+                  return context.tick.label === 'Média' ? '#0C0440' : 'green';
+                },
+                font: {
+                  size: 14,
+                  weight: 'bold'
+                }
+              },
+            },
           },
           transitions: {
-            show: {
-              animations: {
-                x: {
-                  from: 0
-                },
-                y: {
-                  from: 0
-                }
-              }
-            },
             hide: {
               animations: {
                 x: {
-                  to: 0
+                  to: 0,
                 },
                 y: {
-                  to: 0
-                }
-              }
-            }
-          }
+                  to: 0,
+                },
+              },
+            },
+          },
         },
       });
       return () => {
@@ -375,15 +372,15 @@ const Pesquisa: React.FC = () => {
       setShowFavModal(true);
       toast.success('Produto favoritado!', { position: "top-center", autoClose: 5000, closeOnClick: true, pauseOnHover: true, theme: "dark" });
     } catch (error: any) {
-      if (error.message === "Faile to fetch" || error.error.message.includes("NetworkError")) {
+      if (error.message === "Failed to fetch" || error.message.includes("NetworkError")) {
         toast.error('Você precisa estar logado para favoritar!', { position: "bottom-left", autoClose: 5000, closeOnClick: true, pauseOnHover: true, theme: "dark" });
         setTimeout(() => {
-          window.location.href = '../';
+          window.location.href = '../cadastro_login/login';
         }, 2500);
       } else {
         toast.error('Você precisa estar logado para favoritar!', { position: "bottom-left", autoClose: 5000, closeOnClick: true, pauseOnHover: true, theme: "dark" });
         setTimeout(() => {
-          window.location.href = '../';
+          window.location.href = '../cadastro_login/login';
         }, 2500);
       }
     }
@@ -415,7 +412,7 @@ const Pesquisa: React.FC = () => {
 
   return (
     <main>
-          <Navbar />
+      <Navbar />
       {/* Título */}
       <div className="flex justify-center mt-20">
         <ToastContainer />
@@ -426,7 +423,7 @@ const Pesquisa: React.FC = () => {
             produtoId={produtoId}
           />
         )}
-        <h2 className="text-2xl text-black text-center">
+        <h2 className="text-2xl text-center text-black">
           A pesquisa feita foi <span className="font-bold">“{searchTerm}”</span>
         </h2>
       </div>
@@ -437,7 +434,7 @@ const Pesquisa: React.FC = () => {
         {/* Menu de filtros */}
         <Menu as="div" className="relative inline-block text-left max-[650px]:mt-5">
           <div>
-            <Menu.Button className="inline-flex rounded-full px-9 py-4 text-lg bg-navigateblue text-white hover:bg-white hover:text-navigateblue">
+            <Menu.Button className="inline-flex rounded-full px-9 py-4 text-lg bg-navigateblue text-white hover:bg-slate-200 hover:text-navigateblue">
               {textoFiltro}
               <ChevronDownIcon aria-hidden="true" className="ml-2 w-7 text-white" />
             </Menu.Button>
@@ -487,30 +484,14 @@ const Pesquisa: React.FC = () => {
           </Menu.Items>
         </Menu>
       </div>
+      <div className="flex justify-center items-center text-lg text-center font-semibold text-gray-600 mt-4">
+        <p>Produtos atualizados em: 25/10/2024 feito com 💚 e Scrapy</p>
+      </div>
       {/* Mapeamento dos produtos */}
-      {produtosVisiveis.length > 0 ? (
-        <div className="grid grid-cols-4 max-[1250px]:grid-cols-2 max-[600px]:grid-cols-1">
-          {produtosVisiveis.map((produto) => (
-            <Card
-              key={produto.link}
-              imageSrc={produto.imagem}
-              heartIconSrc="/img/icon-coraçao.png"
-              productDescription={produto.título}
-              brandName={produto.loja}
-              price={produto.preço}
-              link={produto.link}
-              avaliacoes={produto.avaliações ?? "0"}
-              estrelas={produto.estrelas ?? "0"}
-              onSave={() => handleSaveProduct(produto)}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="">
-          <p className="mt-10 text-center text-xl text-navigateblue">Nenhum produto encontrado.</p>
-          <h2 className="mt-5 text-center text-xl text-navigateblue">Não encontrou o que procurava? Dê uma olhada nos produtos mais bem avaliados!</h2>
+      {
+        produtosVisiveis.length > 0 ? (
           <div className="grid grid-cols-4 max-[1250px]:grid-cols-2 max-[600px]:grid-cols-1">
-            {sugestoes.map((produto) => (
+            {produtosVisiveis.map((produto) => (
               <Card
                 key={produto.link}
                 imageSrc={produto.imagem}
@@ -525,34 +506,53 @@ const Pesquisa: React.FC = () => {
               />
             ))}
           </div>
-        </div>
-      )
+        ) : (
+          <div className="">
+            <p className="mt-10 text-center text-xl text-navigateblue">Nenhum produto encontrado.</p>
+            <h2 className="mt-5 text-center text-xl text-navigateblue">Não encontrou o que procurava? Dê uma olhada nos produtos mais bem avaliados!</h2>
+            <div className="grid grid-cols-4 max-[1250px]:grid-cols-2 max-[600px]:grid-cols-1">
+              {sugestoes.map((produto) => (
+                <Card
+                  key={produto.link}
+                  imageSrc={produto.imagem}
+                  heartIconSrc="/img/icon-coraçao.png"
+                  productDescription={produto.título}
+                  brandName={produto.loja}
+                  price={produto.preço}
+                  link={produto.link}
+                  avaliacoes={produto.avaliações ?? "0"}
+                  estrelas={produto.estrelas ?? "0"}
+                  onSave={() => handleSaveProduct(produto)}
+                />
+              ))}
+            </div>
+          </div>
+        )
       }
       {/* Navegação */}
       <div className="flex flex-col items-center mt-10">
-      <div className="flex justify-center items-center">
-        {page > 0 && (
-          <a onClick={() => handlePageChange(page - 1)} className="text-white seta-nav mr-2 cursor-pointer">
-            <MdKeyboardArrowLeft size={35} />
-          </a>
-        )}
-        <div className="flex items-center barra-nav">
-          {renderPagination()}
+        <div className="flex justify-center items-center">
+          {page > 0 && (
+            <a onClick={() => handlePageChange(page - 1)} className="seta-nav mr-2">
+              <MdKeyboardArrowLeft size={35} />
+            </a>
+          )}
+          <div className="flex items-center barra-nav">
+            {renderPagination()}
+          </div>
+          {page < totalPaginas - 1 && (
+            <a onClick={() => handlePageChange(page + 1)}>
+              <MdKeyboardArrowRight size={20} className="seta-nav-esq ml-2" />
+            </a>
+          )}
         </div>
-        {page < totalPaginas - 1 && (
-          <a onClick={() => handlePageChange(page + 1)} className="cursor-pointer">
-            <MdKeyboardArrowRight size={20} className="seta-nav-esq ml-2" />
-          </a>
-        )}
       </div>
-    </div>
-
       {/* Tabela */}
       <div className="px-4 sm:px-16 md:px-28 p-5 min-w-[200px]">
         <h2 className="text-center text-2xl font-bold mt-10 mb-4">
-          Preços de produtos em "{searchTerm}"
+          Preços de produtos em &quot;{searchTerm}&quot;
         </h2>
-        <canvas ref={chartRef} className={`rounded-xl ${isChartVisible ? "bg-gray-300" : ""}`}></canvas>
+        <canvas ref={chartRef} className={`rounded-lg mb-10 ${isChartVisible ? "bg-white p-3 border-2 shadow-md shadow-navigateblue border-navigateblue" : ""}`}></canvas>
       </div>
       <Footer />
     </main >

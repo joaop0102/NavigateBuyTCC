@@ -2,6 +2,7 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import Link from "next/link";
+import Image from 'next/image';
 import Animated from "@/utils/animacoes";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
 import { MdArrowForwardIos, MdArrowBackIosNew, MdArrowDropDown } from "react-icons/md";
@@ -37,7 +38,7 @@ const Conversoes = () => {
     const [error, setError] = useState<string | null>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [cardsPerPage, setCardsPerPage] = useState(3);
-    const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
+    const [windowWidth, setWindowWidth] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1024);
 
     useEffect(() => {
         const handleResize = () => {
@@ -51,6 +52,7 @@ const Conversoes = () => {
                 setCardsPerPage(3);
             }
         };
+        
 
         handleResize();
 
@@ -233,10 +235,13 @@ const Conversoes = () => {
                         >Acessar</button>
                     </a>
                     <div className="flex justify-center">
-                        <img
+                        <Image
                             src="/img/globo.png"
                             alt="imagem globo terrestre"
-                            className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl"
+                            width={4000}
+                            height={40}
+                            priority
+                            className="w-auto h-auto"
                         />
                     </div>
                 </Animated>
